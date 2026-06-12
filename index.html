@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>
+      Ojol Staking Hybrid | Dashboard Driver
+    </title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&amp;display=swap" rel="stylesheet" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: &#39;Inter&#39;, sans-serif;
+            background: #f5f9f0;
+            color: #1e293b;
+            padding-bottom: 2rem;
+        }
+        :root {
+            --primary: #00A651;
+            --primary-dark: #008a43;
+            --card-white: #ffffff;
+            --shadow-sm: 0 8px 20px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .container { max-width: 700px; margin: 0 auto; padding: 1rem 1.2rem 2rem; }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0.5rem 0 1rem 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-white);
+            padding: 0.4rem 1rem 0.4rem 0.8rem;
+            border-radius: 60px;
+            box-shadow: var(--shadow-sm);
+        }
+        .logo-img {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #00A651, #008a43);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-img i { font-size: 26px; color: white; }
+        .logo-text { font-weight: 800; font-size: 1.3rem; }
+        .logo-text span { color: var(--primary); }
+        .connect-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .connect-btn:hover { background: var(--primary-dark); transform: scale(0.97); }
+        .card {
+            background: var(--card-white);
+            border-radius: 32px;
+            padding: 1.3rem 1.2rem;
+            margin-bottom: 1.2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #eef2e6;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+            padding-left: 12px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .stat-item {
+            background: #fafdf7;
+            border-radius: 24px;
+            padding: 0.8rem;
+        }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; color: #5b6e4a; }
+        .stat-value { font-weight: 800; font-size: 1.3rem; color: #0f172a; }
+        .small-value { font-size: 0.9rem; }
+        input, select {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 60px;
+            border: 1px solid #e2e8d5;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            background: white;
+            font-family: monospace;
+        }
+        button.primary-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: 700;
+            padding: 0.9rem;
+            border-radius: 60px;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        button.primary-btn:active { transform: scale(0.97); }
+        button.outline-btn {
+            background: transparent;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #ecf3e5;
+        }
+        .flex-btns { display: flex; gap: 12px; }
+        .approval-row {
+            background: #f0fde8;
+            border-radius: 28px;
+            padding: 12px 15px;
+            margin: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .btn-small {
+            padding: 8px 20px;
+            border-radius: 40px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #1e293b;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 40px;
+            z-index: 999;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+        .green-badge {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 4px 12px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        footer { text-align: center; font-size: 0.7rem; color: #8ba36b; margin-top: 1rem; }
+        .wallet-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            background: #ffffffcc;
+            padding: 8px 14px;
+            border-radius: 40px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(2px);
+            border: 1px solid #e2e8d5;
+        }
+        @media (max-width: 500px) { .container { padding: 0.8rem; } }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .address-badge {
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        .error-text { color: #dc2626; font-size: 0.7rem; text-align: center; margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="logo-area">
+          <div class="logo-img">
+            <i class="fas fa-motorcycle"></i>
+          </div>
+          <div class="logo-text">
+            Ojol
+            <span>            Staking
+</span>
+          </div>
+        </div>
+        <button id="connectWalletBtn" class="connect-btn">
+          <i class="fas fa-wallet"></i>
+          <span id="walletBtnText">          Connect Wallet
+</span>
+        </button>
+      </div>
+      <div class="wallet-info" id="walletStatusPanel">
+        <span id="walletShort">        ⚡ Not connected
+</span>
+        <span>        <i class="fas fa-coins" style="color:#00A651;"></i>
+        <strong id="ojolBalance">        0.00
+</strong>
+        OJOL |
+        <i class="fas fa-gas-pump"></i>
+        <span id="nativeBalance">        0
+</span>
+        ETH
+</span>
+      </div>
+      <!-- Staking utama -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-hand-holding-usd" style="color:#00A651;"></i>
+          My Stake &amp; Reward
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">
+              Staked Amount
+            </div>
+            <div class="stat-value" id="myStakeAmount">
+              0 OJOL
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">
+              Pending Reward
+            </div>
+            <div class="stat-value" id="pendingReward">
+              0
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">
+              Total Claimed
+            </div>
+            <div class="stat-value small-value" id="totalClaimedReward">
+              0
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">
+              Finish / Left
+            </div>
+            <div class="stat-value small-value" id="finishTimer">
+              -
+            </div>
+          </div>
+        </div>
+        <div class="flex-btns" style="margin-bottom: 8px;">
+          <button id="claimRewardBtn" class="primary-btn" style="background:#2c7a47;">
+            <i class="fas fa-gift"></i>
+            Claim
+          </button>
+          <button id="withdrawBtn" class="primary-btn outline-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Withdraw
+          </button>
+        </div>
+        <button id="earlyWithdrawBtn" class="outline-btn" style="border-color:#dc2626; color:#dc2626; margin-top:6px;">
+          <i class="fas fa-exclamation-triangle"></i>
+          Early Withdraw (Penalty)
+        </button>
+      </div>
+      <!-- Form Stake + Approval -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-plus-circle"></i>
+          New Stake &amp; Referral
+        </div>
+        <input type="number" id="stakeAmount" placeholder="Amount OJOL (contoh: 100)" value="100" step="any" />
+        <select id="durationDays">
+          <option value="30">
+            30 days
+          </option>
+          <option value="90">
+            90 days
+          </option>
+          <option value="180">
+            180 days
+          </option>
+          <option value="360">
+            360 days
+          </option>
+        </select>
+        <input type="text" id="referrerAddr" placeholder="Referrer address (optional)" />
+        <div class="approval-row" id="approvalPanel">
+          <div>
+            <i class="fas fa-shield-alt"></i>
+            <span id="allowanceStatus">            Cek allowance...
+</span>
+          </div>
+          <button id="approveBtn" class="btn-small">
+            <i class="fas fa-check-double"></i>
+            Approve OJOL
+          </button>
+        </div>
+        <button id="stakeBtn" class="primary-btn">
+          <i class="fas fa-lock"></i>
+          STAKE NOW
+        </button>
+        <div class="address-badge" style="text-align:center; margin-top:8px;">
+          Contract:
+          <span id="contractAddrDisplay"></span>
+        </div>
+      </div>
+      <!-- Rank & Network -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-chart-line"></i>
+          Rank &amp; Network
+        </div>
+        <div class="info-row">
+          <span>          🏅 Rank
+</span>
+          <span id="userRank">          -
+</span>
+        </div>
+        <div class="info-row">
+          <span>          📊 Network Volume
+</span>
+          <span id="networkVolume">          0
+</span>
+        </div>
+        <div class="info-row">
+          <span>          👥 Downline Count
+</span>
+          <span id="downlineCount">          0
+</span>
+        </div>
+        <div class="info-row">
+          <span>          💰 Rank Bonus Claimed
+</span>
+          <span id="rankBonusClaimed">          0
+</span>
+        </div>
+        <div class="info-row">
+          <span>          💸 Ref Earnings
+</span>
+          <span id="refEarnings">          0
+</span>
+        </div>
+        <button id="claimRankBonusBtn" class="primary-btn outline-btn" style="margin-top: 12px;">
+          <i class="fas fa-trophy"></i>
+          Claim Rank Bonus
+        </button>
+        <input type="text" id="downlineAddressRank" placeholder="Downline address untuk claim bonus" style="margin-top: 8px;" />
+      </div>
+      <!-- Global stats -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-chart-simple"></i>
+          Protocol Stats
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">
+              Total Staked
+            </div>
+            <div class="small-value" id="totalStakedGl">
+              0
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">
+              Total Rewards Paid
+            </div>
+            <div class="small-value" id="totalRewardsPaidGl">
+              0
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">
+              Total Ref Rewards
+            </div>
+            <div class="small-value" id="totalRefRewardsGl">
+              0
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">
+              Rank Bonuses
+            </div>
+            <div class="small-value" id="totalRankBonusesGl">
+              0
+            </div>
+          </div>
+        </div>
+        <div id="rewardRateDisplay1" class="info-row">
+          <span>          📈 Reward Rate
+</span>
+          <span>          0.8% / Day
+</span>
+        </div>
+        <div id="minStakeDisplay1" class="info-row">
+          <span>          ⚠️ Min Stake
+</span>
+          <span>          100 OJOL
+</span>
+        </div>
+      </div>
+      <footer>
+        <i class="fas fa-motorcycle"></i>
+        OjolStaking Hybrid V4 | Powered by OJOL Token
+      </footer>
+    </div>
+    <div id="toastMsg" class="toast-msg" style="display: none;">
+    </div>
+    <script>
+      // ===================== KONFIGURASI UPDATE =====================
+    const CONTRACT_ADDR = &#34;0x501d5483a41d3779128E7CE109B8649133bD21f8&#34;;
+    const TOKEN_ADDR = &#34;0x0cCB00abb35109FF33F0AbaB1C07915900954695&#34;;
+    
+    // Tampilkan address contract di UI
+    const contractDisplay = document.getElementById(&#34;contractAddrDisplay&#34;);
+    if (contractDisplay) contractDisplay.innerText = CONTRACT_ADDR;
+    
+    // ===================== ABI DALAM FORMAT JSON YANG BENAR =====================
+    const CONTRACT_ABI = [
+        {
+            &#34;inputs&#34;: [
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;_amountToken&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;_durationDays&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;address&#34;, &#34;name&#34;: &#34;_referrer&#34;, &#34;type&#34;: &#34;address&#34; }
+            ],
+            &#34;name&#34;: &#34;stakeSimple&#34;,
+            &#34;outputs&#34;: [],
+            &#34;stateMutability&#34;: &#34;nonpayable&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [],
+            &#34;name&#34;: &#34;claimReward&#34;,
+            &#34;outputs&#34;: [],
+            &#34;stateMutability&#34;: &#34;nonpayable&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [],
+            &#34;name&#34;: &#34;withdraw&#34;,
+            &#34;outputs&#34;: [],
+            &#34;stateMutability&#34;: &#34;nonpayable&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [],
+            &#34;name&#34;: &#34;earlyWithdraw&#34;,
+            &#34;outputs&#34;: [],
+            &#34;stateMutability&#34;: &#34;nonpayable&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [{ &#34;internalType&#34;: &#34;address&#34;, &#34;name&#34;: &#34;_downline&#34;, &#34;type&#34;: &#34;address&#34; }],
+            &#34;name&#34;: &#34;claimRankBonus&#34;,
+            &#34;outputs&#34;: [],
+            &#34;stateMutability&#34;: &#34;nonpayable&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [{ &#34;internalType&#34;: &#34;address&#34;, &#34;name&#34;: &#34;u&#34;, &#34;type&#34;: &#34;address&#34; }],
+            &#34;name&#34;: &#34;pendingReward&#34;,
+            &#34;outputs&#34;: [{ &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; }],
+            &#34;stateMutability&#34;: &#34;view&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [{ &#34;internalType&#34;: &#34;address&#34;, &#34;name&#34;: &#34;u&#34;, &#34;type&#34;: &#34;address&#34; }],
+            &#34;name&#34;: &#34;getTotalRewardEarned&#34;,
+            &#34;outputs&#34;: [{ &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; }],
+            &#34;stateMutability&#34;: &#34;view&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [{ &#34;internalType&#34;: &#34;address&#34;, &#34;name&#34;: &#34;u&#34;, &#34;type&#34;: &#34;address&#34; }],
+            &#34;name&#34;: &#34;getUserRank&#34;,
+            &#34;outputs&#34;: [
+                { &#34;internalType&#34;: &#34;uint8&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint8&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; }
+            ],
+            &#34;stateMutability&#34;: &#34;view&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [{ &#34;internalType&#34;: &#34;address&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;address&#34; }],
+            &#34;name&#34;: &#34;refEarnings&#34;,
+            &#34;outputs&#34;: [{ &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; }],
+            &#34;stateMutability&#34;: &#34;view&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [],
+            &#34;name&#34;: &#34;contractStats&#34;,
+            &#34;outputs&#34;: [
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; }
+            ],
+            &#34;stateMutability&#34;: &#34;view&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [],
+            &#34;name&#34;: &#34;rewardRate&#34;,
+            &#34;outputs&#34;: [{ &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; }],
+            &#34;stateMutability&#34;: &#34;view&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [],
+            &#34;name&#34;: &#34;minStake&#34;,
+            &#34;outputs&#34;: [{ &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; }],
+            &#34;stateMutability&#34;: &#34;view&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;inputs&#34;: [{ &#34;internalType&#34;: &#34;address&#34;, &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;address&#34; }],
+            &#34;name&#34;: &#34;stakes&#34;,
+            &#34;outputs&#34;: [
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;amount&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;principal&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;startTime&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;finishAt&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;lastRewardTime&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;uint256&#34;, &#34;name&#34;: &#34;totalRewardClaimed&#34;, &#34;type&#34;: &#34;uint256&#34; },
+                { &#34;internalType&#34;: &#34;address&#34;, &#34;name&#34;: &#34;referrer&#34;, &#34;type&#34;: &#34;address&#34; },
+                { &#34;internalType&#34;: &#34;bool&#34;, &#34;name&#34;: &#34;exists&#34;, &#34;type&#34;: &#34;bool&#34; }
+            ],
+            &#34;stateMutability&#34;: &#34;view&#34;,
+            &#34;type&#34;: &#34;function&#34;
+        }
+    ];
+    
+    const TOKEN_ABI = [
+        {
+            &#34;constant&#34;: true,
+            &#34;inputs&#34;: [{ &#34;name&#34;: &#34;account&#34;, &#34;type&#34;: &#34;address&#34; }],
+            &#34;name&#34;: &#34;balanceOf&#34;,
+            &#34;outputs&#34;: [{ &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; }],
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;constant&#34;: true,
+            &#34;inputs&#34;: [{ &#34;name&#34;: &#34;owner&#34;, &#34;type&#34;: &#34;address&#34; }, { &#34;name&#34;: &#34;spender&#34;, &#34;type&#34;: &#34;address&#34; }],
+            &#34;name&#34;: &#34;allowance&#34;,
+            &#34;outputs&#34;: [{ &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;uint256&#34; }],
+            &#34;type&#34;: &#34;function&#34;
+        },
+        {
+            &#34;constant&#34;: false,
+            &#34;inputs&#34;: [{ &#34;name&#34;: &#34;spender&#34;, &#34;type&#34;: &#34;address&#34; }, { &#34;name&#34;: &#34;amount&#34;, &#34;type&#34;: &#34;uint256&#34; }],
+            &#34;name&#34;: &#34;approve&#34;,
+            &#34;outputs&#34;: [{ &#34;name&#34;: &#34;&#34;, &#34;type&#34;: &#34;bool&#34; }],
+            &#34;type&#34;: &#34;function&#34;
+        }
+    ];
+    
+    let web3, contract, tokenContract;
+    let userAccount = null;
+    
+    // Helper function untuk update element dengan aman
+    function setElementText(id, value, suffix = &#39;&#39;) {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = value + suffix;
+    }
+    
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById(&#34;toastMsg&#34;);
+        if (toast) {
+            toast.style.backgroundColor = isError ? &#34;#b91c1c&#34; : &#34;#1e293b&#34;;
+            toast.innerText = msg;
+            toast.style.display = &#34;block&#34;;
+            setTimeout(() =&gt; { if (toast) toast.style.display = &#34;none&#34;; }, 4000);
+        }
+    }
+    
+    async function initWeb3() {
+        if (window.ethereum) {
+            try {
+                web3 = new Web3(window.ethereum);
+                contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDR);
+                tokenContract = new web3.eth.Contract(TOKEN_ABI, TOKEN_ADDR);
+                console.log(&#34;✅ Web3 terinisialisasi dengan benar&#34;);
+                console.log(&#34;Contract Address:&#34;, CONTRACT_ADDR);
+                console.log(&#34;Token Address:&#34;, TOKEN_ADDR);
+                return true;
+            } catch(e) {
+                console.error(&#34;Init web3 error&#34;, e);
+                showToast(&#34;Error inisialisasi Web3&#34;, true);
+                return false;
+            }
+        } else {
+            showToast(&#34;MetaMask tidak terdeteksi! Silakan install MetaMask.&#34;, true);
+            return false;
+        }
+    }
+    
+    async function updateWalletInfo() {
+        if (!userAccount || !tokenContract || !web3) return;
+        try {
+            const balanceWei = await tokenContract.methods.balanceOf(userAccount).call();
+            const balanceEth = web3.utils.fromWei(balanceWei, &#39;ether&#39;);
+            setElementText(&#34;ojolBalance&#34;, parseFloat(balanceEth).toFixed(4));
+            
+            const allowanceWei = await tokenContract.methods.allowance(userAccount, CONTRACT_ADDR).call();
+            const allowanceEth = web3.utils.fromWei(allowanceWei, &#39;ether&#39;);
+            const stakeAmountElem = document.getElementById(&#34;stakeAmount&#34;);
+            const requiredAmount = stakeAmountElem ? parseFloat(stakeAmountElem.value) || 0 : 0;
+            
+            const allowanceStatus = document.getElementById(&#34;allowanceStatus&#34;);
+            if (allowanceStatus) {
+                if (requiredAmount &gt; 0 &amp;&amp; parseFloat(allowanceEth) &gt;= requiredAmount) {
+                    allowanceStatus.innerHTML = `&lt;span class=&#34;green-badge&#34;&gt;✅ Allowance mencukupi (${parseFloat(allowanceEth).toFixed(4)} OJOL)&lt;/span&gt;`;
+                } else if (requiredAmount &gt; 0) {
+                    allowanceStatus.innerHTML = `&lt;span style=&#34;color:#b45309;&#34;&gt;⚠️ Allowance ${parseFloat(allowanceEth).toFixed(4)} &lt; ${requiredAmount}, perlu approve&lt;/span&gt;`;
+                } else {
+                    allowanceStatus.innerHTML = `🔓 Allowance: ${parseFloat(allowanceEth).toFixed(4)} OJOL`;
+                }
+            }
+            
+            const ethBalanceWei = await web3.eth.getBalance(userAccount);
+            setElementText(&#34;nativeBalance&#34;, parseFloat(web3.utils.fromWei(ethBalanceWei, &#39;ether&#39;)).toFixed(5));
+        } catch (e) {
+            console.warn(&#34;updateWalletInfo error&#34;, e);
+        }
+    }
+    
+    async function refreshAllData() {
+        if (!userAccount || !contract) return;
+        try {
+            // Get stake info
+            const stake = await contract.methods.stakes(userAccount).call();
+            const exists = stake.exists;
+            let stakeAmount = exists ? web3.utils.fromWei(stake.amount, &#39;ether&#39;) : &#34;0&#34;;
+            setElementText(&#34;myStakeAmount&#34;, parseFloat(stakeAmount).toFixed(2), &#34; OJOL&#34;);
+            
+            const pendingWei = await contract.methods.pendingReward(userAccount).call();
+            setElementText(&#34;pendingReward&#34;, parseFloat(web3.utils.fromWei(pendingWei, &#39;ether&#39;)).toFixed(4));
+            
+            const totalClaimedWei = await contract.methods.getTotalRewardEarned(userAccount).call();
+            setElementText(&#34;totalClaimedReward&#34;, parseFloat(web3.utils.fromWei(totalClaimedWei, &#39;ether&#39;)).toFixed(4));
+            
+            if (exists &amp;&amp; Number(stake.finishAt) &gt; 0) {
+                const finishMs = Number(stake.finishAt) * 1000;
+                const now = Date.now();
+                if (finishMs &gt; now) {
+                    let daysLeft = Math.ceil((finishMs - now) / (1000 * 3600 * 24));
+                    setElementText(&#34;finishTimer&#34;, `${daysLeft} days left`);
+                } else {
+                    setElementText(&#34;finishTimer&#34;, &#34;✅ Ready to withdraw&#34;);
+                }
+            } else {
+                setElementText(&#34;finishTimer&#34;, &#34;No active stake&#34;);
+            }
+            
+            // Get rank data
+            const rankData = await contract.methods.getUserRank(userAccount).call();
+            const rank = rankData[0];
+            const netVol = web3.utils.fromWei(rankData[1], &#39;ether&#39;);
+            const downCount = rankData[2];
+            const rankBonusClaimed = web3.utils.fromWei(rankData[3], &#39;ether&#39;);
+            setElementText(&#34;userRank&#34;, rank == 0 ? &#34;No Rank&#34; : `Rank ${rank} 👑`);
+            setElementText(&#34;networkVolume&#34;, parseFloat(netVol).toFixed(2));
+            setElementText(&#34;downlineCount&#34;, downCount.toString());
+            setElementText(&#34;rankBonusClaimed&#34;, parseFloat(rankBonusClaimed).toFixed(4));
+            
+            const refEarn = await contract.methods.refEarnings(userAccount).call();
+            setElementText(&#34;refEarnings&#34;, parseFloat(web3.utils.fromWei(refEarn, &#39;ether&#39;)).toFixed(4));
+            
+            // Get global stats
+            const stats = await contract.methods.contractStats().call();
+            setElementText(&#34;totalStakedGl&#34;, parseFloat(web3.utils.fromWei(stats[0], &#39;ether&#39;)).toFixed(2));
+            setElementText(&#34;totalRewardsPaidGl&#34;, parseFloat(web3.utils.fromWei(stats[1], &#39;ether&#39;)).toFixed(2));
+            setElementText(&#34;totalRefRewardsGl&#34;, parseFloat(web3.utils.fromWei(stats[2], &#39;ether&#39;)).toFixed(2));
+            setElementText(&#34;totalRankBonusesGl&#34;, parseFloat(web3.utils.fromWei(stats[3], &#39;ether&#39;)).toFixed(2));
+            
+            // Get reward rate and min stake
+            const rewardRate = await contract.methods.rewardRate().call();
+            const minStakeVal = await contract.methods.minStake().call();
+            const rewardRateEl = document.getElementById(&#34;rewardRateDisplay&#34;);
+            if (rewardRateEl) rewardRateEl.innerHTML = `&lt;span&gt;📈 Reward Rate&lt;/span&gt;&lt;span&gt;${rewardRate}/10000 per day&lt;/span&gt;`;
+            const minStakeEl = document.getElementById(&#34;minStakeDisplay&#34;);
+            if (minStakeEl) minStakeEl.innerHTML = `&lt;span&gt;⚠️ Min Stake&lt;/span&gt;&lt;span&gt;${web3.utils.fromWei(minStakeVal, &#39;ether&#39;)} OJOL&lt;/span&gt;`;
+            const minStakeSpan = document.getElementById(&#34;minStakeSpan&#34;);
+            if (minStakeSpan) minStakeSpan.innerHTML = web3.utils.fromWei(minStakeVal, &#39;ether&#39;);
+            
+        } catch (e) {
+            console.error(&#34;refreshAllData error&#34;, e);
+        }
+    }
+    
+    async function approveOJOL() {
+        if (!userAccount) { showToast(&#34;Connect wallet dulu&#34;, true); return; }
+        let amountToken = document.getElementById(&#34;stakeAmount&#34;).value;
+        if (!amountToken || parseFloat(amountToken) &lt;= 0) { showToast(&#34;Masukkan jumlah OJOL yang akan di-approve&#34;, true); return; }
+        const amountWei = web3.utils.toWei(amountToken, &#39;ether&#39;);
+        try {
+            showToast(`Menyetujui ${amountToken} OJOL ...`);
+            await tokenContract.methods.approve(CONTRACT_ADDR, amountWei).send({ from: userAccount });
+            showToast(`✅ Approve ${amountToken} OJOL berhasil!`);
+            await updateWalletInfo();
+        } catch (e) {
+            showToast(&#34;Approve gagal: &#34; + (e.message || e), true);
+        }
+    }
+    
+    async function performStake() {
+        if (!userAccount) { showToast(&#34;Hubungkan wallet terlebih dahulu&#34;, true); return; }
+        let amountToken = document.getElementById(&#34;stakeAmount&#34;).value;
+        if (!amountToken || parseFloat(amountToken) &lt;= 0) { showToast(&#34;Masukkan amount OJOL yang valid&#34;, true); return; }
+        const durationDays = parseInt(document.getElementById(&#34;durationDays&#34;).value);
+        let referrer = document.getElementById(&#34;referrerAddr&#34;).value.trim();
+        if (referrer === &#34;&#34;) referrer = &#34;0x0000000000000000000000000000000000000000&#34;;
+        if (referrer !== &#34;0x0000000000000000000000000000000000000000&#34; &amp;&amp; !web3.utils.isAddress(referrer)) {
+            showToast(&#34;Address referrer tidak valid&#34;, true);
+            return;
+        }
+        const amountWei = web3.utils.toWei(amountToken, &#39;ether&#39;);
+        const minStakeWei = await contract.methods.minStake().call();
+        if (web3.utils.toBN(amountWei).lt(web3.utils.toBN(minStakeWei))) {
+            showToast(`Minimal stake ${web3.utils.fromWei(minStakeWei, &#39;ether&#39;)} OJOL`, true);
+            return;
+        }
+        const allowanceWei = await tokenContract.methods.allowance(userAccount, CONTRACT_ADDR).call();
+        if (web3.utils.toBN(allowanceWei).lt(web3.utils.toBN(amountWei))) {
+            showToast(&#34;Allowance tidak cukup. Silakan klik &#39;Approve OJOL&#39; terlebih dahulu&#34;, true);
+            return;
+        }
+        try {
+            showToast(&#34;Memproses stake...&#34;);
+            await contract.methods.stakeSimple(amountToken, durationDays, referrer).send({ from: userAccount });
+            showToast(`🎉 Staking ${amountToken} OJOL berhasil!`);
+            await refreshAllData();
+            await updateWalletInfo();
+        } catch (e) {
+            console.error(e);
+            showToast(&#34;Stake gagal: &#34; + (e.message || e), true);
+        }
+    }
+    
+    async function claimReward() {
+        if (!userAccount) return;
+        try {
+            await contract.methods.claimReward().send({ from: userAccount });
+            showToast(&#34;Reward berhasil diklaim!&#34;);
+            refreshAllData();
+            updateWalletInfo();
+        } catch (e) { showToast(&#34;Claim reward error: &#34; + e.message, true); }
+    }
+    
+    async function withdrawFull() {
+        if (!userAccount) return;
+        try {
+            await contract.methods.withdraw().send({ from: userAccount });
+            showToast(&#34;Withdraw sukses (principal + reward)&#34;);
+            refreshAllData();
+            updateWalletInfo();
+        } catch (e) { showToast(&#34;Withdraw error: &#34; + e.message, true); }
+    }
+    
+    async function earlyWithdraw() {
+        if (!userAccount) return;
+        if (confirm(&#34;⚠️ Peringatan: Penalti akan dikenakan! Lanjutkan early withdraw?&#34;)) {
+            try {
+                await contract.methods.earlyWithdraw().send({ from: userAccount });
+                showToast(&#34;Early withdraw selesai, penalti diterapkan.&#34;);
+                refreshAllData();
+                updateWalletInfo();
+            } catch (e) { showToast(&#34;Early withdraw gagal: &#34; + e.message, true); }
+        }
+    }
+    
+    async function claimRankBonus() {
+        const downline = document.getElementById(&#34;downlineAddressRank&#34;).value.trim();
+        if (!downline || !web3.utils.isAddress(downline)) { showToast(&#34;Masukkan address downline valid&#34;, true); return; }
+        try {
+            await contract.methods.claimRankBonus(downline).send({ from: userAccount });
+            showToast(&#34;Rank bonus claimed!&#34;);
+            refreshAllData();
+        } catch (e) { showToast(&#34;Claim rank bonus gagal: &#34; + e.message, true); }
+    }
+    
+    async function connectWallet() {
+        if (!window.ethereum) {
+            showToast(&#34;MetaMask tidak terinstall! Install MetaMask.&#34;, true);
+            alert(&#34;MetaMask tidak ditemukan. Silakan install ekstensi MetaMask.&#34;);
+            return;
+        }
+        try {
+            const accounts = await window.ethereum.request({ method: &#34;eth_requestAccounts&#34; });
+            if (accounts.length === 0) throw new Error(&#34;Tidak ada akun yang dipilih&#34;);
+            userAccount = accounts[0];
+            
+            if (!web3) {
+                web3 = new Web3(window.ethereum);
+                contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDR);
+                tokenContract = new web3.eth.Contract(TOKEN_ABI, TOKEN_ADDR);
+            }
+            
+            const walletBtn = document.getElementById(&#34;walletBtnText&#34;);
+            if (walletBtn) walletBtn.innerText = userAccount.slice(0,6) + &#34;...&#34; + userAccount.slice(-4);
+            const walletShort = document.getElementById(&#34;walletShort&#34;);
+            if (walletShort) walletShort.innerHTML = `&lt;i class=&#34;fas fa-user-check&#34;&gt;&lt;/i&gt; ${userAccount.slice(0,8)}...${userAccount.slice(-6)}`;
+            
+            await refreshAllData();
+            await updateWalletInfo();
+            
+            window.ethereum.on(&#34;accountsChanged&#34;, async (accs) =&gt; {
+                if (accs.length &gt; 0 &amp;&amp; accs[0]) {
+                    userAccount = accs[0];
+                    if (walletBtn) walletBtn.innerText = userAccount.slice(0,6) + &#34;...&#34;;
+                    if (walletShort) walletShort.innerHTML = `&lt;i class=&#34;fas fa-user-check&#34;&gt;&lt;/i&gt; ${userAccount.slice(0,8)}...${userAccount.slice(-6)}`;
+                    await refreshAllData();
+                    await updateWalletInfo();
+                } else {
+                    userAccount = null;
+                    if (walletBtn) walletBtn.innerText = &#34;Connect Wallet&#34;;
+                    if (walletShort) walletShort.innerHTML = &#34;⚡ Not connected&#34;;
+                }
+            });
+            
+            showToast(`Wallet terhubung: ${userAccount.slice(0,8)}...`);
+        } catch (error) {
+            console.error(&#34;Koneksi gagal:&#34;, error);
+            showToast(&#34;Gagal connect wallet: &#34; + (error.message || &#34;User rejected&#34;), true);
+        }
+    }
+    
+    // Event binding dengan pengecekan elemen
+    window.addEventListener(&#34;load&#34;, async () =&gt; {
+        await initWeb3();
+        
+        if (window.ethereum &amp;&amp; window.ethereum.selectedAddress) {
+            userAccount = window.ethereum.selectedAddress;
+            if (web3) {
+                const walletBtn = document.getElementById(&#34;walletBtnText&#34;);
+                if (walletBtn) walletBtn.innerText = userAccount.slice(0,6) + &#34;...&#34;;
+                const walletShort = document.getElementById(&#34;walletShort&#34;);
+                if (walletShort) walletShort.innerHTML = `&lt;i class=&#34;fas fa-link&#34;&gt;&lt;/i&gt; ${userAccount.slice(0,8)}...`;
+                await refreshAllData();
+                await updateWalletInfo();
+            }
+        }
+        
+        const connectBtn = document.getElementById(&#34;connectWalletBtn&#34;);
+        if (connectBtn) connectBtn.addEventListener(&#34;click&#34;, connectWallet);
+        
+        const stakeBtn = document.getElementById(&#34;stakeBtn&#34;);
+        if (stakeBtn) stakeBtn.addEventListener(&#34;click&#34;, performStake);
+        
+        const approveBtn = document.getElementById(&#34;approveBtn&#34;);
+        if (approveBtn) approveBtn.addEventListener(&#34;click&#34;, approveOJOL);
+        
+        const claimBtn = document.getElementById(&#34;claimRewardBtn&#34;);
+        if (claimBtn) claimBtn.addEventListener(&#34;click&#34;, claimReward);
+        
+        const withdrawBtn = document.getElementById(&#34;withdrawBtn&#34;);
+        if (withdrawBtn) withdrawBtn.addEventListener(&#34;click&#34;, withdrawFull);
+        
+        const earlyBtn = document.getElementById(&#34;earlyWithdrawBtn&#34;);
+        if (earlyBtn) earlyBtn.addEventListener(&#34;click&#34;, earlyWithdraw);
+        
+        const rankBonusBtn = document.getElementById(&#34;claimRankBonusBtn&#34;);
+        if (rankBonusBtn) rankBonusBtn.addEventListener(&#34;click&#34;, claimRankBonus);
+        
+        const stakeAmountInput = document.getElementById(&#34;stakeAmount&#34;);
+        if (stakeAmountInput) stakeAmountInput.addEventListener(&#34;input&#34;, () =&gt; { if (userAccount) updateWalletInfo(); });
+    });
+    
+    setInterval(() =&gt; {
+        if (userAccount) {
+            refreshAllData();
+            updateWalletInfo();
+        }
+    }, 14000);
+    </script>
+  </body>
+</html>
