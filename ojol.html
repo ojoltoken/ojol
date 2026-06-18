@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ojol Staking Hybrid | Dashboard Driver</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-img"><i class="fas fa-motorcycle"></i></div>
+            <div class="logo-text">Ojol<span>Staking</span></div>
+        </div>
+        <button id="connectWalletBtn" class="connect-btn"><i class="fas fa-wallet"></i> <span id="walletBtnText">Connect Wallet</span></button>
+    </div>
+    
+    <div class="wallet-info" id="walletStatusPanel">
+        <div class="wallet-left">
+            <span id="walletShort">⚡ Not connected</span>
+        </div>
+        <div class="wallet-right">
+            <span><i class="fas fa-coins" style="color:#00A651;"></i> <strong id="ojolBalance">0.00</strong> OJOL</span>
+            <span><i class="fas fa-gas-pump"></i> <span id="nativeBalance">0</span> ETH</span>
+        </div>
+    </div>
+
+    <!-- Card Referral Link (Terpisah) -->
+    <div class="card ref-link-card" id="refLinkCard" style="display: none;">
+        <div class="card-title"><i class="fas fa-link" style="color:#16a34a;"></i> Referral Link</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span class="ref-badge"><i class="fas fa-user-plus"></i> Your Referral</span>
+                <div class="referral-link-container" style="flex: 1;">
+                    <input type="text" id="referralLinkInput" readonly value="">
+                    <button id="copyRefLinkBtn" class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                    <button id="shareRefLinkBtn" class="share-btn"><i class="fas fa-share-alt"></i> Share</button>
+                </div>
+            </div>
+            <div style="font-size: 0.7rem; color: #64748b; padding: 0 8px;">
+                <i class="fas fa-info-circle"></i> Bagikan link ini untuk mendapatkan komisi referral dari setiap stake yang dilakukan melalui link Anda
+            </div>
+        </div>
+    </div>
+
+    <!-- Staking utama -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-hand-holding-usd" style="color:#00A651;"></i> My Stake & Reward</div>
+        <div class="stats-grid">
+            <div class="stat-item"><div class="stat-label">Staked Amount</div><div class="stat-value" id="myStakeAmount">0 OJOL</div></div>
+            <div class="stat-item"><div class="stat-label">Pending Reward</div><div class="stat-value" id="pendingReward">0</div></div>
+            <div class="stat-item"><div class="stat-label">Total Claimed</div><div class="stat-value small-value" id="totalClaimedReward">0</div></div>
+            <div class="stat-item"><div class="stat-label">Finish / Left</div><div class="stat-value small-value" id="finishTimer">-</div></div>
+        </div>
+        <div class="flex-btns" style="margin-bottom: 8px;">
+            <button id="claimRewardBtn" class="primary-btn" style="background:#2c7a47;"><i class="fas fa-gift"></i> Claim</button>
+            <button id="withdrawBtn" class="primary-btn outline-btn"><i class="fas fa-sign-out-alt"></i> Withdraw</button>
+        </div>
+        <button id="earlyWithdrawBtn" class="outline-btn" style="border-color:#dc2626; color:#dc2626; margin-top:6px;"><i class="fas fa-exclamation-triangle"></i> Early Withdraw (Penalty)</button>
+    </div>
+
+    <!-- Form Stake + Approval -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-plus-circle"></i> New Stake & Referral</div>
+        <input type="number" id="stakeAmount" placeholder="Amount OJOL (contoh: 100)" value="100" step="any">
+        <select id="durationDays">
+            <option value="30">30 days</option>
+            <option value="90">90 days</option>
+            <option value="180">180 days</option>
+            <option value="360">360 days</option>
+        </select>
+        <input type="text" id="referrerAddr" placeholder="Referrer address (optional)">
+        <div id="refDetected" style="display: none; background: #e8f5e9; padding: 8px 16px; border-radius: 30px; font-size: 0.8rem; margin-bottom: 12px;">
+            <i class="fas fa-user-check" style="color: #00A651;"></i> Referrer detected from link: <span id="detectedRefAddr" style="font-family: monospace; font-weight: 600;"></span>
+        </div>
+        
+        <div class="approval-row" id="approvalPanel">
+            <div><i class="fas fa-shield-alt"></i> <span id="allowanceStatus">Cek allowance...</span></div>
+            <button id="approveBtn" class="btn-small"><i class="fas fa-check-double"></i> Approve OJOL</button>
+        </div>
+        
+        <button id="stakeBtn" class="primary-btn"><i class="fas fa-lock"></i> STAKE NOW</button>
+        <div class="address-badge" style="text-align:center; margin-top:8px;">
+            Contract: <span id="contractAddrDisplay"></span>
+        </div>
+    </div>
+
+    <!-- Rank & Network -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-chart-line"></i> Rank & Network</div>
+        <div class="info-row"><span>🏅 Rank</span><span id="userRank">-</span></div>
+        <div class="info-row"><span>📊 Network Volume</span><span id="networkVolume">0</span></div>
+        <div class="info-row"><span>👥 Downline Count</span><span id="downlineCount">0</span></div>
+        <div class="info-row"><span>💰 Rank Bonus Claimed</span><span id="rankBonusClaimed">0</span></div>
+        <div class="info-row"><span>💸 Ref Earnings</span><span id="refEarnings">0</span></div>
+    </div>
+
+    <!-- Daftar Downline & Claim Rank Bonus -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-users"></i> Downline & Rank Bonus</div>
+        <div id="downlineListContainer">
+            <div class="no-downline">⏳ Memuat daftar downline...</div>
+        </div>
+        <div style="margin-top: 12px; font-size: 0.75rem; color: #64748b; text-align: center;">
+            * Hanya menampilkan downline level 1 (langsung)
+        </div>
+    </div>
+
+    <!-- Global stats -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-chart-simple"></i> Protocol Stats</div>
+        <div class="stats-grid">
+            <div class="stat-item"><div class="stat-label">Total Staked</div><div class="small-value" id="totalStakedGl">0</div></div>
+            <div class="stat-item"><div class="stat-label">Total Rewards Paid</div><div class="small-value" id="totalRewardsPaidGl">0</div></div>
+            <div class="stat-item"><div class="stat-label">Total Ref Rewards</div><div class="small-value" id="totalRefRewardsGl">0</div></div>
+            <div class="stat-item"><div class="stat-label">Rank Bonuses</div><div class="small-value" id="totalRankBonusesGl">0</div></div>
+        </div>
+        <div id="rewardRateDisplay" class="info-row"><span>📈 Reward Rate</span><span>Loading...</span></div>
+        <div id="minStakeDisplay" class="info-row"><span>⚠️ Min Stake</span><span>Loading...</span></div>
+    </div>
+    <footer><i class="fas fa-motorcycle"></i> OjolStaking Hybrid V4 | Powered by OJOL Token</footer>
+</div>
+<div id="toastMsg" class="toast-msg" style="display: none;"></div>
+<script src="script.js"></script>
+
+</body>
+</html>
