@@ -1,0 +1,76 @@
+DISCLAIMER PROJECT OJOL TOKEN
+  
+1. SIFAT INFORMASI
+Seluruh konten, informasi, dan materi yang disajikan di platform Ojol Token (termasuk website, smart contract, dan dokumentasi) bersifat edukatif dan informatif semata. Konten ini BUKAN merupakan nasihat keuangan, investasi, perdagangan, pajak, atau hukum. Keputusan investasi sepenuhnya adalah tanggung jawab Anda sendiri.
+
+2. RISIKO INVESTASI CRYPTO
+Berinvestasi dalam cryptocurrency dan produk staking mengandung risiko tinggi, termasuk namun tidak terbatas pada:
+
+Volatilitas harga yang ekstrim
+Risiko likuiditas
+Risiko teknis pada smart contract
+Perubahan regulasi
+Kehilangan akses wallet (private key)
+Serangan siber dan peretasan
+Nilai token dapat turun hingga 100%. Anda harus siap kehilangan seluruh dana yang diinvestasikan.
+
+3. SMART CONTRACT & TEKNOLOGI
+Meskipun smart contract Ojol Staking telah:
+
+✅ Diverifikasi secara publik di blockchain
+✅ Open source (kode dapat dilihat siapa saja)
+✅ Diaudit secara independen
+
+TETAPI tidak ada sistem yang 100% bebas risiko. Bug, exploit, atau serangan terhadap blockchain dapat terjadi. Kami tidak bertanggung jawab atas kehilangan dana akibat hal-hal tersebut.
+
+4. TIDAK ADA ADMIN / PERANTARA
+Platform ini berjalan 100% otomatis melalui smart contract. Tidak ada admin, tim, atau manusia yang dapat:
+
+Mengubah aturan staking
+Mengambil dana Anda
+Memberikan jaminan keuntungan
+Setiap interaksi terjadi langsung di blockchain dan tidak dapat diubah setelah transaksi diproses.
+
+5. KEWAJIBAN & TANGGUNG JAWAB PENGGUNA
+Dengan menggunakan platform ini, Anda menyatakan dan menyetujui bahwa:
+
+Anda adalah pengguna yang kompeten dan dewasa secara hukum (minimal 18 tahun)
+Anda memahami sepenuhnya cara kerja blockchain dan staking
+Anda bertanggung jawab penuh atas keamanan wallet dan private key Anda
+Anda tidak akan menggunakan platform untuk kegiatan ilegal
+Anda telah melakukan riset sendiri (DYOR) sebelum berinvestasi
+
+6. REGULASI & HUKUM
+Status hukum cryptocurrency berbeda di setiap yurisdiksi. Anda bertanggung jawab untuk:
+
+Memahami hukum di negara/daerah Anda
+Membayar pajak yang berlaku atas keuntungan investasi
+Mematuhi semua peraturan yang berlaku
+Kami tidak bertanggung jawab atas pelanggaran hukum yang dilakukan oleh pengguna.
+
+7. TIDAK ADA JAMINAN
+Platform ini disediakan "SEBAGAIMANA ADANYA" (AS-IS) tanpa jaminan apa pun, baik tersurat maupun tersirat, termasuk namun tidak terbatas pada:
+
+Jaminan keuntungan atau hasil tertentu
+Jaminan ketersediaan layanan 24/7
+Jaminan keamanan absolut
+
+8. PERUBAHAN & PEMBARUAN
+Kami berhak untuk mengubah, memperbarui, atau memodifikasi disclaimer ini sewaktu-waktu tanpa pemberitahuan sebelumnya. Versi terbaru akan selalu tersedia di platform ini.
+
+9. KONTAK & DUKUNGAN
+Untuk pertanyaan lebih lanjut, Anda dapat mengakses:
+
+GitHub Repository: https://github.com/ojoltoken/ojol
+
+Smart Contract Address: 0x501d5483a41d3779128E7CE109B8649133bD21f8
+
+PERNYATAAN PERSETUJUAN
+Dengan mengakses dan menggunakan platform Ojol Token, Anda menyatakan bahwa Anda:
+
+Telah membaca dan memahami seluruh disclaimer ini
+Menyetujui semua risiko yang terkait dengan penggunaan platform
+Melepaskan hak untuk menuntut ganti rugi atas kerugian yang terjadi
+Bertanggung jawab penuh atas keputusan investasi Anda sendiri
+
+© 2026 Ojol Token Project | Powered by Blockchain Technology  
