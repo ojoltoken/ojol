@@ -42,6 +42,21 @@ Klik "Mulai Staking" dan sambungkan wallet-mu ke aplikasi. Hanya 1 klik!
 Tentukan jumlah OJOL yang mau di-stake dan durasi (30/90/180/360 hari).
 4. Stake & Dapatkan Reward
 
+Reward / Bonus :
+1. Bonus Referal Direct : 10%, Level 2 : 5%, Level 3 : 2% dari nilai Staking, realtime masuk ke Wallet
+2. Bonus Komunitas
+   V1 : syarat Omset 1.000.000 OJOL, reward 5% dari hasil Staking Team
+   V2 : syarat Omset 3.000.000 OJOL, reward 10% dari hasil Staking Team
+   V3 : syarat Omset 8.000.000 OJOL, reward 15% dari hasil Staking Team
+
+Bonus dan Reward Staking bisa di klaim kapan saja!
+
+Smart Contract :
+https://bscscan.com/address/0x501d5483a41d3779128E7CE109B8649133bD21f8#code
+
+Ojol TOken Contract:
+https://bscscan.com/token/0x0ccb00abb35109ff33f0abab1c07915900954695
+
 Disclaimer
 https://github.com/ojoltoken/ojol/blob/main/disclaimer.txt
 
