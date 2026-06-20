@@ -1,4 +1,4 @@
-# ojol
+# Ojol Token Staking - 100% Blockchain
 Ojol Token For Hail-Riding Driver
 
 Staking OJOL Token
