@@ -28,7 +28,6 @@
             padding: 20px;
         }
 
-        /* ===== MAIN CONTAINER ===== */
         .app-container {
             max-width: 480px;
             width: 100%;
@@ -184,6 +183,10 @@
             margin-left: 4px;
         }
 
+        .balance-card .value.loading {
+            opacity: 0.5;
+        }
+
         /* ===== MAIN CONTENT ===== */
         .main-content {
             padding: 20px 24px 28px;
@@ -284,6 +287,11 @@
             font-weight: 400;
         }
 
+        .trade-card .input-wrap input:disabled {
+            background: #f3f4f6;
+            cursor: not-allowed;
+        }
+
         .trade-card .input-wrap .token-symbol {
             font-size: 16px;
             font-weight: 700;
@@ -310,6 +318,7 @@
             padding: 8px 0 12px;
             color: #6b7280;
             font-size: 13px;
+            flex-wrap: wrap;
         }
 
         .rate-display .rate-value {
@@ -332,7 +341,6 @@
             transform: rotate(180deg);
         }
 
-        /* ===== WHITELIST BADGE ===== */
         .whitelist-badge {
             display: inline-flex;
             align-items: center;
@@ -343,7 +351,6 @@
             border-radius: 100px;
             font-size: 11px;
             font-weight: 600;
-            margin-left: 8px;
         }
 
         .whitelist-badge i {
@@ -498,7 +505,7 @@
             padding: 20px 0;
         }
 
-        /* ===== TOAST NOTIFICATION ===== */
+        /* ===== TOAST ===== */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -558,22 +565,30 @@
             .toast-container { right: 10px; left: 10px; max-width: 100%; }
         }
 
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #f0fdf4; }
-        ::-webkit-scrollbar-thumb { background: #00a651; border-radius: 4px; }
-
-        /* ===== LOADING SKELETON ===== */
-        .skeleton {
-            background: linear-gradient(90deg, #f0fdf4 25%, #e5f0e8 50%, #f0fdf4 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 8px;
+        /* ===== STATUS BAR ===== */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0 4px;
+            font-size: 11px;
+            color: #6b7280;
         }
 
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+        .status-bar .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .status-bar .status-dot.online {
+            background: #4ade80;
+        }
+
+        .status-bar .status-dot.offline {
+            background: #f87171;
         }
     </style>
 </head>
@@ -612,6 +627,15 @@
 
         <!-- MAIN CONTENT -->
         <div class="main-content">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span>
+                    <span class="status-dot online" id="statusDot"></span>
+                    <span id="statusText">Connected to BSC</span>
+                </span>
+                <span id="blockNumber">Block: --</span>
+            </div>
+
             <!-- Swap Direction Toggle -->
             <div class="swap-direction" id="swapDirection">
                 <button class="option active" data-direction="buy">
@@ -636,9 +660,9 @@
                 </div>
             </div>
 
-            <!-- Swap Arrow -->
+            <!-- Rate Display -->
             <div class="rate-display">
-                <span class="rate-value" id="rateDisplay">1 OJOL = 0.056 USDT</span>
+                <span class="rate-value" id="rateDisplay">Loading rate...</span>
                 <i class="fas fa-exchange-alt swap-icon" id="swapIcon" title="Swap direction"></i>
                 <span id="whitelistBadge" class="whitelist-badge" style="display:none;">
                     <i class="fas fa-star"></i> +20% Bonus
@@ -683,19 +707,14 @@
 
     <script>
         // ============================================================
-        // CONFIGURATION
+        // CONFIGURATION - GANTI DENGAN ADDRESS TREASURY ANDA!
         // ============================================================
         const CONFIG = {
-            // BSC Mainnet
             chainId: 56,
             rpcUrl: 'https://bsc-dataseed.binance.org/',
-            
-            // Contract Addresses
-            treasuryAddress: '0xf593282F7E1d2a5ebcd6c956834ca3B81720E8a7', // SC TREASURY
+            treasuryAddress: '0xf593282F7E1d2a5ebcd6c956834ca3B81720E8a7', // SC TREASURY 
             ojolAddress: '0x0cCB00abb35109FF33F0AbaB1C07915900954695', // SC Ojol Token
-            usdtAddress: '0x55d398326f99059fF775485246999027B3197955', // SC USDT 
-            
-            // ABIs (minimal)
+            usdtAddress: '0x55d398326f99059fF775485246999027B3197955', // SC Usdt
             treasuryABI: [
                 'function buyOJOL(uint256 usdtAmount) external',
                 'function sellOJOL(uint256 ojolAmount) external',
@@ -723,10 +742,10 @@
             account: null,
             chainId: null,
             connected: false,
-            direction: 'buy', // 'buy' or 'sell'
+            direction: 'buy',
             ojolBalance: '0',
             usdtBalance: '0',
-            rate: '0.056',
+            rate: '0',
             minPurchase: '10',
             maxPurchase: '1000',
             isWhitelisted: false,
@@ -736,7 +755,8 @@
             ojolDecimals: 18,
             usdtDecimals: 18,
             ojolSymbol: 'OJOL',
-            usdtSymbol: 'USDT'
+            usdtSymbol: 'USDT',
+            blockNumber: 0
         };
 
         // ============================================================
@@ -764,14 +784,17 @@
             clearHistory: $('clearHistory'),
             swapIcon: $('swapIcon'),
             swapDirection: $('swapDirection'),
-            toastContainer: $('toastContainer')
+            toastContainer: $('toastContainer'),
+            statusText: $('statusText'),
+            statusDot: $('statusDot'),
+            blockNumber: $('blockNumber')
         };
 
         // ============================================================
         // UTILITY FUNCTIONS
         // ============================================================
         function formatNumber(num, decimals = 2) {
-            if (!num || isNaN(num)) return '0.00';
+            if (!num || isNaN(num) || num === '0') return '0.00';
             return parseFloat(num).toFixed(decimals);
         }
 
@@ -781,7 +804,8 @@
         }
 
         function fromWei(amount, decimals = 18) {
-            return parseFloat(amount) / Math.pow(10, decimals);
+            if (!amount) return '0';
+            return (parseFloat(amount) / Math.pow(10, decimals)).toString();
         }
 
         function toWei(amount, decimals = 18) {
@@ -803,7 +827,7 @@
         }
 
         // ============================================================
-        // TOAST NOTIFICATIONS
+        // TOAST
         // ============================================================
         function showToast(message, type = 'info', duration = 5000) {
             const icons = {
@@ -827,13 +851,9 @@
             `;
 
             dom.toastContainer.appendChild(toast);
-
             const closeBtn = toast.querySelector('.toast-close');
             closeBtn.addEventListener('click', () => toast.remove());
-
-            setTimeout(() => {
-                if (toast.parentNode) toast.remove();
-            }, duration);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, duration);
         }
 
         // ============================================================
@@ -865,6 +885,9 @@
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: `0x${CONFIG.chainId.toString(16)}` }]
                         });
+                        // Reload after switch
+                        setTimeout(() => window.location.reload(), 1000);
+                        return;
                     } catch (switchError) {
                         showToast('Please switch to BSC Mainnet', 'error');
                         return;
@@ -874,7 +897,6 @@
                 state.account = accounts[0];
                 state.chainId = parseInt(chainId);
                 state.connected = true;
-
                 state.web3 = new Web3(window.ethereum);
 
                 // Setup listeners
@@ -883,7 +905,7 @@
                         disconnectWallet();
                     } else {
                         state.account = newAccounts[0];
-                        updateUI();
+                        loadAllData();
                     }
                 });
 
@@ -896,13 +918,15 @@
                     <span class="wallet-address">${formatAddress(state.account)}</span>
                 `;
 
+                dom.statusText.textContent = '✅ Connected';
+                dom.statusDot.className = 'status-dot online';
+
                 showToast('Wallet connected successfully!', 'success');
-                await loadData();
-                updateUI();
+                await loadAllData();
 
             } catch (error) {
                 console.error('Connection error:', error);
-                showToast('Failed to connect wallet', 'error');
+                showToast('Failed to connect wallet: ' + error.message, 'error');
             }
         }
 
@@ -914,47 +938,83 @@
             dom.connectBtn.innerHTML = `<i class="fas fa-wallet"></i> Connect`;
             dom.actionBtn.disabled = true;
             dom.actionBtnText.textContent = 'Connect Wallet';
-            updateUI();
+            dom.statusText.textContent = 'Disconnected';
+            dom.statusDot.className = 'status-dot offline';
+            dom.ojolBalance.innerHTML = '0.00 <span class="small">OJOL</span>';
+            dom.usdtBalance.innerHTML = '0.00 <span class="small">USDT</span>';
+            dom.fromBalance.textContent = 'Balance: 0.00';
+            dom.toBalance.textContent = 'Balance: 0.00';
         }
 
         // ============================================================
-        // LOAD DATA
+        // LOAD ALL DATA
         // ============================================================
-        async function loadData() {
+        async function loadAllData() {
             if (!state.connected || !state.web3) return;
 
-            const { treasury, ojol, usdt } = getContracts(state.web3);
-
             try {
-                // Get decimals
+                const { treasury, ojol, usdt } = getContracts(state.web3);
+
+                // Load decimals & symbols
                 try {
-                    state.ojolDecimals = await ojol.methods.decimals().call();
-                    state.usdtDecimals = await usdt.methods.decimals().call();
+                    state.ojolDecimals = parseInt(await ojol.methods.decimals().call());
+                    state.usdtDecimals = parseInt(await usdt.methods.decimals().call());
                     state.ojolSymbol = await ojol.methods.symbol().call();
                     state.usdtSymbol = await usdt.methods.symbol().call();
-                } catch (e) {}
+                } catch (e) {
+                    console.warn('Error loading decimals:', e);
+                }
 
-                // Get balances
-                const ojolBal = await ojol.methods.balanceOf(state.account).call();
-                const usdtBal = await usdt.methods.balanceOf(state.account).call();
-                state.ojolBalance = fromWei(ojolBal, state.ojolDecimals);
-                state.usdtBalance = fromWei(usdtBal, state.usdtDecimals);
+                // Load balances
+                try {
+                    const ojolBal = await ojol.methods.balanceOf(state.account).call();
+                    const usdtBal = await usdt.methods.balanceOf(state.account).call();
+                    state.ojolBalance = fromWei(ojolBal, state.ojolDecimals);
+                    state.usdtBalance = fromWei(usdtBal, state.usdtDecimals);
+                } catch (e) {
+                    console.warn('Error loading balances:', e);
+                }
 
-                // Get rate
-                const rateWei = await treasury.methods.rate().call();
-                state.rate = fromWei(rateWei, 18);
+                // Load rate
+                try {
+                    const rateWei = await treasury.methods.rate().call();
+                    state.rate = fromWei(rateWei, 18);
+                } catch (e) {
+                    console.warn('Error loading rate:', e);
+                    state.rate = '0.056';
+                }
 
-                // Get limits
-                const minWei = await treasury.methods.minPurchaseUSDT().call();
-                const maxWei = await treasury.methods.maxPurchaseUSDT().call();
-                state.minPurchase = fromWei(minWei, 18);
-                state.maxPurchase = fromWei(maxWei, 18);
+                // Load limits
+                try {
+                    const minWei = await treasury.methods.minPurchaseUSDT().call();
+                    const maxWei = await treasury.methods.maxPurchaseUSDT().call();
+                    state.minPurchase = fromWei(minWei, 18);
+                    state.maxPurchase = fromWei(maxWei, 18);
+                } catch (e) {
+                    console.warn('Error loading limits:', e);
+                }
 
                 // Check whitelist
-                state.isWhitelisted = await treasury.methods.isWhitelistedAddress(state.account).call();
+                try {
+                    state.isWhitelisted = await treasury.methods.isWhitelistedAddress(state.account).call();
+                } catch (e) {
+                    state.isWhitelisted = false;
+                }
 
                 // Check paused
-                state.isPaused = await treasury.methods.paused().call();
+                try {
+                    state.isPaused = await treasury.methods.paused().call();
+                } catch (e) {
+                    state.isPaused = false;
+                }
+
+                // Get block number
+                try {
+                    state.blockNumber = await state.web3.eth.getBlockNumber();
+                    dom.blockNumber.textContent = `Block: ${state.blockNumber}`;
+                } catch (e) {}
+
+                updateUI();
 
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -999,8 +1059,6 @@
 
             // Update action button
             updateActionButton();
-
-            // Calculate on input change
             calculateTrade();
         }
 
@@ -1024,22 +1082,22 @@
                 return;
             }
 
-            const maxBalance = state.direction === 'buy' ? state.usdtBalance : state.ojolBalance;
+            const maxBalance = state.direction === 'buy' ? parseFloat(state.usdtBalance) : parseFloat(state.ojolBalance);
             if (amount > maxBalance) {
                 dom.actionBtn.disabled = true;
-                dom.actionBtnText.textContent = `Insufficient ${state.direction === 'buy' ? 'USDT' : 'OJOL'} balance`;
+                dom.actionBtnText.textContent = `Insufficient ${state.direction === 'buy' ? 'USDT' : 'OJOL'}`;
                 return;
             }
 
             if (amount < parseFloat(state.minPurchase)) {
                 dom.actionBtn.disabled = true;
-                dom.actionBtnText.textContent = `Min ${state.minPurchase} USDT`;
+                dom.actionBtnText.textContent = `Min ${formatNumber(state.minPurchase, 2)} USDT`;
                 return;
             }
 
             if (amount > parseFloat(state.maxPurchase)) {
                 dom.actionBtn.disabled = true;
-                dom.actionBtnText.textContent = `Max ${state.maxPurchase} USDT`;
+                dom.actionBtnText.textContent = `Max ${formatNumber(state.maxPurchase, 2)} USDT`;
                 return;
             }
 
@@ -1052,7 +1110,7 @@
         // ============================================================
         function calculateTrade() {
             const amount = parseFloat(dom.fromInput.value);
-            if (!amount || amount <= 0) {
+            if (!amount || amount <= 0 || parseFloat(state.rate) <= 0) {
                 dom.toInput.value = '';
                 return;
             }
@@ -1062,13 +1120,13 @@
                 // USDT -> OJOL
                 result = amount / parseFloat(state.rate);
                 if (state.isWhitelisted) {
-                    result = result * 1.2; // 20% bonus
+                    result = result * 1.2;
                 }
                 dom.toInput.value = formatNumber(result, 6);
             } else {
                 // OJOL -> USDT
                 result = amount * parseFloat(state.rate);
-                const fee = result * 0.05; // 5% fee
+                const fee = result * 0.05;
                 result = result - fee;
                 dom.toInput.value = formatNumber(result, 4);
             }
@@ -1092,21 +1150,20 @@
 
             try {
                 const { treasury, ojol, usdt } = getContracts(state.web3);
-                const amountWei = toWei(amount, state.direction === 'buy' ? state.usdtDecimals : state.ojolDecimals);
 
                 if (state.direction === 'buy') {
-                    // BUY OJOL: Approve USDT first
+                    const amountWei = toWei(amount, state.usdtDecimals);
+                    
+                    // Check allowance
                     const allowance = await usdt.methods.allowance(state.account, CONFIG.treasuryAddress).call();
-                    if (parseInt(allowance) < parseInt(amountWei)) {
+                    if (BigInt(allowance) < BigInt(amountWei.toString())) {
                         showToast('Approving USDT...', 'info', 3000);
-                        const approveTx = await usdt.methods.approve(CONFIG.treasuryAddress, amountWei).send({
+                        const approveTx = await usdt.methods.approve(CONFIG.treasuryAddress, amountWei.toString()).send({
                             from: state.account
                         });
-                        console.log('Approval tx:', approveTx.transactionHash);
                         showToast('USDT approved!', 'success', 2000);
                     }
 
-                    // Execute buy
                     showToast('Buying OJOL...', 'info', 3000);
                     const tx = await treasury.methods.buyOJOL(amountWei.toString()).send({
                         from: state.account
@@ -1116,18 +1173,18 @@
                     addHistory('buy', dom.toInput.value, amount, tx.transactionHash);
 
                 } else {
-                    // SELL OJOL: Approve OJOL first
+                    const amountWei = toWei(amount, state.ojolDecimals);
+                    
+                    // Check allowance
                     const allowance = await ojol.methods.allowance(state.account, CONFIG.treasuryAddress).call();
-                    if (parseInt(allowance) < parseInt(amountWei)) {
+                    if (BigInt(allowance) < BigInt(amountWei.toString())) {
                         showToast('Approving OJOL...', 'info', 3000);
-                        const approveTx = await ojol.methods.approve(CONFIG.treasuryAddress, amountWei).send({
+                        const approveTx = await ojol.methods.approve(CONFIG.treasuryAddress, amountWei.toString()).send({
                             from: state.account
                         });
-                        console.log('Approval tx:', approveTx.transactionHash);
                         showToast('OJOL approved!', 'success', 2000);
                     }
 
-                    // Execute sell
                     showToast('Selling OJOL...', 'info', 3000);
                     const tx = await treasury.methods.sellOJOL(amountWei.toString()).send({
                         from: state.account
@@ -1137,9 +1194,7 @@
                     addHistory('sell', amount, dom.toInput.value, tx.transactionHash);
                 }
 
-                // Reload data
-                await loadData();
-                updateUI();
+                await loadAllData();
                 dom.fromInput.value = '';
                 dom.toInput.value = '';
 
@@ -1151,15 +1206,15 @@
                 } else if (error.message.includes('Insufficient')) {
                     message = 'Insufficient balance or allowance';
                 } else if (error.message.includes('below minimum')) {
-                    message = `Minimum is ${state.minPurchase} USDT`;
+                    message = `Minimum is ${formatNumber(state.minPurchase, 2)} USDT`;
                 } else if (error.message.includes('above maximum')) {
-                    message = `Maximum is ${state.maxPurchase} USDT`;
+                    message = `Maximum is ${formatNumber(state.maxPurchase, 2)} USDT`;
                 }
                 showToast(`❌ ${message}`, 'error');
             } finally {
                 state.isLoading = false;
-                updateActionButton();
                 dom.actionBtn.innerHTML = `<i class="fas fa-arrow-right"></i> <span id="actionBtnText">${state.direction === 'buy' ? 'Buy OJOL' : 'Sell OJOL'}</span>`;
+                updateActionButton();
             }
         }
 
@@ -1174,7 +1229,6 @@
                 txHash,
                 timestamp: Date.now()
             };
-
             state.history.unshift(entry);
             if (state.history.length > 20) state.history.pop();
             renderHistory();
@@ -1186,7 +1240,6 @@
                 dom.historyList.innerHTML = '<div class="history-empty">No transactions yet</div>';
                 return;
             }
-
             dom.historyList.innerHTML = state.history.map(h => `
                 <div class="history-item">
                     <div class="h-left">
@@ -1207,29 +1260,21 @@
         }
 
         function saveHistory() {
-            try {
-                localStorage.setItem('ojolTradeHistory', JSON.stringify(state.history));
-            } catch (e) {}
+            try { localStorage.setItem('ojolTradeHistory', JSON.stringify(state.history)); } catch (e) {}
         }
 
         function loadHistory() {
             try {
                 const data = localStorage.getItem('ojolTradeHistory');
-                if (data) {
-                    state.history = JSON.parse(data);
-                    renderHistory();
-                }
+                if (data) { state.history = JSON.parse(data); renderHistory(); }
             } catch (e) {}
         }
 
         // ============================================================
         // EVENT LISTENERS
         // ============================================================
-
-        // Connect button
         dom.connectBtn.addEventListener('click', connectWallet);
 
-        // Direction toggle
         document.querySelectorAll('.swap-direction .option').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.swap-direction .option').forEach(b => b.classList.remove('active'));
@@ -1241,7 +1286,6 @@
             });
         });
 
-        // Swap icon
         dom.swapIcon.addEventListener('click', () => {
             const current = state.direction;
             state.direction = current === 'buy' ? 'sell' : 'buy';
@@ -1253,21 +1297,27 @@
             updateUI();
         });
 
-        // Input change
         dom.fromInput.addEventListener('input', () => {
             calculateTrade();
             updateActionButton();
         });
 
-        // Action button
         dom.actionBtn.addEventListener('click', executeTrade);
 
-        // Clear history
         dom.clearHistory.addEventListener('click', () => {
             state.history = [];
             renderHistory();
             saveHistory();
             showToast('History cleared', 'info');
+        });
+
+        // ============================================================
+        // KEYBOARD SHORTCUT
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !dom.actionBtn.disabled) {
+                executeTrade();
+            }
         });
 
         // ============================================================
@@ -1277,36 +1327,45 @@
             loadHistory();
 
             // Check if already connected
-            if (window.ethereum && window.ethereum.selectedAddress) {
-                await connectWallet();
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        await connectWallet();
+                    } else {
+                        updateUI();
+                    }
+                } catch (e) {
+                    console.warn('Auto-connect failed:', e);
+                    updateUI();
+                }
             } else {
                 updateUI();
+                showToast('Please install MetaMask', 'info', 5000);
             }
 
-            // Auto-refresh balances every 15 seconds
+            // Auto-refresh every 15 seconds
             setInterval(async () => {
                 if (state.connected) {
-                    await loadData();
-                    updateUI();
+                    await loadAllData();
                 }
             }, 15000);
         }
 
-        init();
-
         // ============================================================
-        // KEYBOARD SHORTCUTS
+        // DEBUG HELPER
         // ============================================================
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !dom.actionBtn.disabled) {
-                executeTrade();
-            }
-        });
-
         console.log('🚀 OJOL Trade App loaded!');
         console.log('📊 Treasury Address:', CONFIG.treasuryAddress);
         console.log('🪙 OJOL Address:', CONFIG.ojolAddress);
         console.log('💰 USDT Address:', CONFIG.usdtAddress);
+        console.log('💡 Pastikan treasuryAddress sudah diganti dengan address yang benar!');
+
+        if (CONFIG.treasuryAddress === '0x...') {
+            console.warn('⚠️ PERINGATAN: treasuryAddress masih default! Ganti dengan address treasury Anda!');
+        }
+
+        init();
     </script>
 
 </body>
