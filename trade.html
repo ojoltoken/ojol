@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trade OJOL Token</title>
+    <!-- Web3 -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0fdf4;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .app-container {
+            max-width: 480px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, #00a651 0%, #008844 100%);
+            padding: 24px 24px 20px;
+            color: white;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title .logo {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            backdrop-filter: blur(4px);
+        }
+
+        .header-title h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-title h1 span {
+            font-weight: 300;
+            opacity: 0.8;
+            font-size: 14px;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* ===== WALLET CONNECT ===== */
+        .wallet-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wallet-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(4px);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wallet-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+        .wallet-btn.connected {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .wallet-btn .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            display: inline-block;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .wallet-address {
+            font-size: 12px;
+            font-weight: 500;
+            opacity: 0.8;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ===== BALANCE DISPLAY ===== */
+        .balance-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .balance-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(4px);
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .balance-card .label {
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .balance-card .value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .balance-card .value .small {
+            font-size: 13px;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-left: 4px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            padding: 20px 24px 28px;
+        }
+
+        /* ===== TOGGLE SWAP ===== */
+        .swap-direction {
+            display: flex;
+            background: #f0fdf4;
+            border-radius: 16px;
+            padding: 4px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .swap-direction .option {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 13px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #6b7280;
+            border: none;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            z-index: 1;
+        }
+
+        .swap-direction .option.active {
+            color: #065f46;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0, 166, 81, 0.15);
+        }
+
+        .swap-direction .option i {
+            margin-right: 8px;
+        }
+
+        /* ===== TRADE CARD ===== */
+        .trade-card {
+            background: #f9fdfb;
+            border: 1px solid #e5f0e8;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .trade-card:focus-within {
+            border-color: #00a651;
+            box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+        }
+
+        .trade-card .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .trade-card .label-row .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .trade-card .label-row .balance {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .trade-card .input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .trade-card .input-wrap input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            padding: 4px 0;
+            width: 100%;
+        }
+
+        .trade-card .input-wrap input::placeholder {
+            color: #b0c4b8;
+            font-weight: 400;
+        }
+
+        .trade-card .input-wrap .token-symbol {
+            font-size: 16px;
+            font-weight: 700;
+            color: #065f46;
+            background: #e5f0e8;
+            padding: 6px 14px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .trade-card .input-wrap .token-symbol i {
+            font-size: 14px;
+        }
+
+        /* ===== RATE DISPLAY ===== */
+        .rate-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0 12px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .rate-display .rate-value {
+            background: #f0fdf4;
+            padding: 4px 14px;
+            border-radius: 100px;
+            font-weight: 600;
+            color: #065f46;
+            font-size: 14px;
+        }
+
+        .rate-display .swap-icon {
+            color: #00a651;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .rate-display .swap-icon:hover {
+            transform: rotate(180deg);
+        }
+
+        /* ===== WHITELIST BADGE ===== */
+        .whitelist-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #d1fae5;
+            color: #065f46;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .whitelist-badge i {
+            font-size: 10px;
+        }
+
+        /* ===== ACTION BUTTON ===== */
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00a651 0%, #008844 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 166, 81, 0.35);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .action-btn:disabled {
+            background: #b0c4b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .action-btn .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== TRANSACTION HISTORY ===== */
+        .history-section {
+            margin-top: 20px;
+            border-top: 1px solid #e5f0e8;
+            padding-top: 16px;
+        }
+
+        .history-section .history-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .history-section .history-title h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .history-section .history-title .clear-btn {
+            background: none;
+            border: none;
+            color: #6b7280;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0fdf4;
+            font-size: 13px;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item .h-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-item .h-left .h-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .history-item .h-left .h-icon.buy {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .history-item .h-left .h-icon.sell {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .history-item .h-left .h-detail .h-main {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .history-item .h-left .h-detail .h-sub {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .history-item .h-right {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .history-item .h-right .h-amount {
+            color: #1f2937;
+        }
+
+        .history-item .h-right .h-usd {
+            font-size: 11px;
+            font-weight: 400;
+            color: #6b7280;
+        }
+
+        .history-empty {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 13px;
+            padding: 20px 0;
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 380px;
+            width: 100%;
+        }
+
+        .toast {
+            background: #1f2937;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .toast.success { background: #065f46; }
+        .toast.error { background: #991b1b; }
+        .toast.info { background: #1e3a5f; }
+
+        .toast i {
+            font-size: 18px;
+        }
+
+        .toast .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .header { padding: 18px 16px 16px; }
+            .header-title h1 { font-size: 18px; }
+            .main-content { padding: 16px; }
+            .trade-card { padding: 16px; }
+            .trade-card .input-wrap input { font-size: 22px; }
+            .balance-card .value { font-size: 16px; }
+            .wallet-btn { padding: 6px 12px; font-size: 12px; }
+            .toast-container { right: 10px; left: 10px; max-width: 100%; }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #f0fdf4; }
+        ::-webkit-scrollbar-thumb { background: #00a651; border-radius: 4px; }
+
+        /* ===== LOADING SKELETON ===== */
+        .skeleton {
+            background: linear-gradient(90deg, #f0fdf4 25%, #e5f0e8 50%, #f0fdf4 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="app-container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-top">
+                <div class="header-title">
+                    <div class="logo">OJ</div>
+                    <div>
+                        <h1>Trade OJOL <span>Token Treasury</span></h1>
+                    </div>
+                </div>
+                <div class="wallet-section">
+                    <button id="connectWalletBtn" class="wallet-btn">
+                        <i class="fas fa-wallet"></i>
+                        <span id="walletBtnText">Connect</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Balance Display -->
+            <div class="balance-display">
+                <div class="balance-card">
+                    <div class="label"><i class="fas fa-coins"></i> OJOL Balance</div>
+                    <div class="value" id="ojolBalance">0.00 <span class="small">OJOL</span></div>
+                </div>
+                <div class="balance-card">
+                    <div class="label"><i class="fas fa-dollar-sign"></i> USDT Balance</div>
+                    <div class="value" id="usdtBalance">0.00 <span class="small">USDT</span></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- Swap Direction Toggle -->
+            <div class="swap-direction" id="swapDirection">
+                <button class="option active" data-direction="buy">
+                    <i class="fas fa-arrow-down"></i> Buy OJOL
+                </button>
+                <button class="option" data-direction="sell">
+                    <i class="fas fa-arrow-up"></i> Sell OJOL
+                </button>
+            </div>
+
+            <!-- Trade Card - From -->
+            <div class="trade-card" id="fromCard">
+                <div class="label-row">
+                    <span class="label" id="fromLabel">You Pay</span>
+                    <span class="balance" id="fromBalance">Balance: 0.00</span>
+                </div>
+                <div class="input-wrap">
+                    <input type="number" id="fromInput" placeholder="0.0" step="any" min="0" />
+                    <span class="token-symbol" id="fromSymbol">
+                        <i class="fas fa-dollar-sign"></i> USDT
+                    </span>
+                </div>
+            </div>
+
+            <!-- Swap Arrow -->
+            <div class="rate-display">
+                <span class="rate-value" id="rateDisplay">1 OJOL = 0.056 USDT</span>
+                <i class="fas fa-exchange-alt swap-icon" id="swapIcon" title="Swap direction"></i>
+                <span id="whitelistBadge" class="whitelist-badge" style="display:none;">
+                    <i class="fas fa-star"></i> +20% Bonus
+                </span>
+            </div>
+
+            <!-- Trade Card - To -->
+            <div class="trade-card" id="toCard">
+                <div class="label-row">
+                    <span class="label" id="toLabel">You Receive</span>
+                    <span class="balance" id="toBalance">Balance: 0.00</span>
+                </div>
+                <div class="input-wrap">
+                    <input type="number" id="toInput" placeholder="0.0" step="any" min="0" readonly />
+                    <span class="token-symbol" id="toSymbol">
+                        <i class="fas fa-coins"></i> OJOL
+                    </span>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <button id="actionBtn" class="action-btn" disabled>
+                <i class="fas fa-wallet"></i>
+                <span id="actionBtnText">Connect Wallet</span>
+            </button>
+
+            <!-- Transaction History -->
+            <div class="history-section">
+                <div class="history-title">
+                    <h3><i class="fas fa-clock-rotate-left"></i> Recent Transactions</h3>
+                    <button class="clear-btn" id="clearHistory">Clear All</button>
+                </div>
+                <div id="historyList">
+                    <div class="history-empty">No transactions yet</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION
+        // ============================================================
+        const CONFIG = {
+            // BSC Mainnet
+            chainId: 56,
+            rpcUrl: 'https://bsc-dataseed.binance.org/',
+            
+            // Contract Addresses
+            treasuryAddress: '0xf593282F7E1d2a5ebcd6c956834ca3B81720E8a7', // SC TREASURY
+            ojolAddress: '0x0cCB00abb35109FF33F0AbaB1C07915900954695', // SC Ojol Token
+            usdtAddress: '0x55d398326f99059fF775485246999027B3197955', // SC USDT 
+            
+            // ABIs (minimal)
+            treasuryABI: [
+                'function buyOJOL(uint256 usdtAmount) external',
+                'function sellOJOL(uint256 ojolAmount) external',
+                'function rate() view returns (uint256)',
+                'function minPurchaseUSDT() view returns (uint256)',
+                'function maxPurchaseUSDT() view returns (uint256)',
+                'function getTreasuryBalance() view returns (uint256, uint256)',
+                'function isWhitelistedAddress(address) view returns (bool)',
+                'function paused() view returns (bool)'
+            ],
+            erc20ABI: [
+                'function balanceOf(address) view returns (uint256)',
+                'function approve(address, uint256) returns (bool)',
+                'function allowance(address, address) view returns (uint256)',
+                'function decimals() view returns (uint8)',
+                'function symbol() view returns (string)'
+            ]
+        };
+
+        // ============================================================
+        // STATE
+        // ============================================================
+        const state = {
+            web3: null,
+            account: null,
+            chainId: null,
+            connected: false,
+            direction: 'buy', // 'buy' or 'sell'
+            ojolBalance: '0',
+            usdtBalance: '0',
+            rate: '0.056',
+            minPurchase: '10',
+            maxPurchase: '1000',
+            isWhitelisted: false,
+            isPaused: false,
+            isLoading: false,
+            history: [],
+            ojolDecimals: 18,
+            usdtDecimals: 18,
+            ojolSymbol: 'OJOL',
+            usdtSymbol: 'USDT'
+        };
+
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const $ = (id) => document.getElementById(id);
+        const dom = {
+            connectBtn: $('connectWalletBtn'),
+            walletBtnText: $('walletBtnText'),
+            ojolBalance: $('ojolBalance'),
+            usdtBalance: $('usdtBalance'),
+            fromInput: $('fromInput'),
+            toInput: $('toInput'),
+            fromLabel: $('fromLabel'),
+            toLabel: $('toLabel'),
+            fromSymbol: $('fromSymbol'),
+            toSymbol: $('toSymbol'),
+            fromBalance: $('fromBalance'),
+            toBalance: $('toBalance'),
+            rateDisplay: $('rateDisplay'),
+            whitelistBadge: $('whitelistBadge'),
+            actionBtn: $('actionBtn'),
+            actionBtnText: $('actionBtnText'),
+            historyList: $('historyList'),
+            clearHistory: $('clearHistory'),
+            swapIcon: $('swapIcon'),
+            swapDirection: $('swapDirection'),
+            toastContainer: $('toastContainer')
+        };
+
+        // ============================================================
+        // UTILITY FUNCTIONS
+        // ============================================================
+        function formatNumber(num, decimals = 2) {
+            if (!num || isNaN(num)) return '0.00';
+            return parseFloat(num).toFixed(decimals);
+        }
+
+        function formatAddress(addr) {
+            if (!addr) return '';
+            return addr.slice(0, 6) + '...' + addr.slice(-4);
+        }
+
+        function fromWei(amount, decimals = 18) {
+            return parseFloat(amount) / Math.pow(10, decimals);
+        }
+
+        function toWei(amount, decimals = 18) {
+            return BigInt(Math.floor(parseFloat(amount) * Math.pow(10, decimals)));
+        }
+
+        function getExplorerUrl(txHash) {
+            return `https://bscscan.com/tx/${txHash}`;
+        }
+
+        function getTimeAgo(timestamp) {
+            const diff = Date.now() - timestamp;
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'Just now';
+            if (mins < 60) return mins + 'm ago';
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return hours + 'h ago';
+            return Math.floor(hours / 24) + 'd ago';
+        }
+
+        // ============================================================
+        // TOAST NOTIFICATIONS
+        // ============================================================
+        function showToast(message, type = 'info', duration = 5000) {
+            const icons = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-xmark',
+                info: 'fa-circle-info'
+            };
+            const colors = {
+                success: '#065f46',
+                error: '#991b1b',
+                info: '#1e3a5f'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.style.backgroundColor = colors[type] || colors.info;
+            toast.innerHTML = `
+                <i class="fas ${icons[type] || icons.info}"></i>
+                <span>${message}</span>
+                <button class="toast-close"><i class="fas fa-times"></i></button>
+            `;
+
+            dom.toastContainer.appendChild(toast);
+
+            const closeBtn = toast.querySelector('.toast-close');
+            closeBtn.addEventListener('click', () => toast.remove());
+
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, duration);
+        }
+
+        // ============================================================
+        // CONTRACT HELPERS
+        // ============================================================
+        function getContracts(web3) {
+            const treasury = new web3.eth.Contract(CONFIG.treasuryABI, CONFIG.treasuryAddress);
+            const ojol = new web3.eth.Contract(CONFIG.erc20ABI, CONFIG.ojolAddress);
+            const usdt = new web3.eth.Contract(CONFIG.erc20ABI, CONFIG.usdtAddress);
+            return { treasury, ojol, usdt };
+        }
+
+        // ============================================================
+        // WALLET CONNECTION
+        // ============================================================
+        async function connectWallet() {
+            if (!window.ethereum) {
+                showToast('Please install MetaMask!', 'error');
+                return;
+            }
+
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+
+                if (parseInt(chainId) !== CONFIG.chainId) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: `0x${CONFIG.chainId.toString(16)}` }]
+                        });
+                    } catch (switchError) {
+                        showToast('Please switch to BSC Mainnet', 'error');
+                        return;
+                    }
+                }
+
+                state.account = accounts[0];
+                state.chainId = parseInt(chainId);
+                state.connected = true;
+
+                state.web3 = new Web3(window.ethereum);
+
+                // Setup listeners
+                window.ethereum.on('accountsChanged', (newAccounts) => {
+                    if (newAccounts.length === 0) {
+                        disconnectWallet();
+                    } else {
+                        state.account = newAccounts[0];
+                        updateUI();
+                    }
+                });
+
+                window.ethereum.on('chainChanged', () => window.location.reload());
+
+                dom.walletBtnText.textContent = formatAddress(state.account);
+                dom.connectBtn.classList.add('connected');
+                dom.connectBtn.innerHTML = `
+                    <span class="dot"></span>
+                    <span class="wallet-address">${formatAddress(state.account)}</span>
+                `;
+
+                showToast('Wallet connected successfully!', 'success');
+                await loadData();
+                updateUI();
+
+            } catch (error) {
+                console.error('Connection error:', error);
+                showToast('Failed to connect wallet', 'error');
+            }
+        }
+
+        function disconnectWallet() {
+            state.connected = false;
+            state.account = null;
+            dom.walletBtnText.textContent = 'Connect';
+            dom.connectBtn.classList.remove('connected');
+            dom.connectBtn.innerHTML = `<i class="fas fa-wallet"></i> Connect`;
+            dom.actionBtn.disabled = true;
+            dom.actionBtnText.textContent = 'Connect Wallet';
+            updateUI();
+        }
+
+        // ============================================================
+        // LOAD DATA
+        // ============================================================
+        async function loadData() {
+            if (!state.connected || !state.web3) return;
+
+            const { treasury, ojol, usdt } = getContracts(state.web3);
+
+            try {
+                // Get decimals
+                try {
+                    state.ojolDecimals = await ojol.methods.decimals().call();
+                    state.usdtDecimals = await usdt.methods.decimals().call();
+                    state.ojolSymbol = await ojol.methods.symbol().call();
+                    state.usdtSymbol = await usdt.methods.symbol().call();
+                } catch (e) {}
+
+                // Get balances
+                const ojolBal = await ojol.methods.balanceOf(state.account).call();
+                const usdtBal = await usdt.methods.balanceOf(state.account).call();
+                state.ojolBalance = fromWei(ojolBal, state.ojolDecimals);
+                state.usdtBalance = fromWei(usdtBal, state.usdtDecimals);
+
+                // Get rate
+                const rateWei = await treasury.methods.rate().call();
+                state.rate = fromWei(rateWei, 18);
+
+                // Get limits
+                const minWei = await treasury.methods.minPurchaseUSDT().call();
+                const maxWei = await treasury.methods.maxPurchaseUSDT().call();
+                state.minPurchase = fromWei(minWei, 18);
+                state.maxPurchase = fromWei(maxWei, 18);
+
+                // Check whitelist
+                state.isWhitelisted = await treasury.methods.isWhitelistedAddress(state.account).call();
+
+                // Check paused
+                state.isPaused = await treasury.methods.paused().call();
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showToast('Error loading contract data', 'error');
+            }
+        }
+
+        // ============================================================
+        // UPDATE UI
+        // ============================================================
+        function updateUI() {
+            // Balances
+            dom.ojolBalance.innerHTML = `${formatNumber(state.ojolBalance, 4)} <span class="small">OJOL</span>`;
+            dom.usdtBalance.innerHTML = `${formatNumber(state.usdtBalance, 2)} <span class="small">USDT</span>`;
+
+            // Rate
+            dom.rateDisplay.textContent = `1 OJOL = ${formatNumber(state.rate, 4)} USDT`;
+
+            // Whitelist badge
+            if (state.isWhitelisted && state.connected) {
+                dom.whitelistBadge.style.display = 'inline-flex';
+            } else {
+                dom.whitelistBadge.style.display = 'none';
+            }
+
+            // Update from/to labels based on direction
+            if (state.direction === 'buy') {
+                dom.fromLabel.textContent = 'You Pay';
+                dom.toLabel.textContent = 'You Receive';
+                dom.fromSymbol.innerHTML = '<i class="fas fa-dollar-sign"></i> USDT';
+                dom.toSymbol.innerHTML = '<i class="fas fa-coins"></i> OJOL';
+                dom.fromBalance.textContent = `Balance: ${formatNumber(state.usdtBalance, 2)} USDT`;
+                dom.toBalance.textContent = `Balance: ${formatNumber(state.ojolBalance, 4)} OJOL`;
+            } else {
+                dom.fromLabel.textContent = 'You Sell';
+                dom.toLabel.textContent = 'You Receive';
+                dom.fromSymbol.innerHTML = '<i class="fas fa-coins"></i> OJOL';
+                dom.toSymbol.innerHTML = '<i class="fas fa-dollar-sign"></i> USDT';
+                dom.fromBalance.textContent = `Balance: ${formatNumber(state.ojolBalance, 4)} OJOL`;
+                dom.toBalance.textContent = `Balance: ${formatNumber(state.usdtBalance, 2)} USDT`;
+            }
+
+            // Update action button
+            updateActionButton();
+
+            // Calculate on input change
+            calculateTrade();
+        }
+
+        function updateActionButton() {
+            if (!state.connected) {
+                dom.actionBtn.disabled = true;
+                dom.actionBtnText.textContent = 'Connect Wallet';
+                return;
+            }
+
+            if (state.isPaused) {
+                dom.actionBtn.disabled = true;
+                dom.actionBtnText.textContent = '⚠️ Contract Paused';
+                return;
+            }
+
+            const amount = parseFloat(dom.fromInput.value);
+            if (!amount || amount <= 0) {
+                dom.actionBtn.disabled = true;
+                dom.actionBtnText.textContent = 'Enter an amount';
+                return;
+            }
+
+            const maxBalance = state.direction === 'buy' ? state.usdtBalance : state.ojolBalance;
+            if (amount > maxBalance) {
+                dom.actionBtn.disabled = true;
+                dom.actionBtnText.textContent = `Insufficient ${state.direction === 'buy' ? 'USDT' : 'OJOL'} balance`;
+                return;
+            }
+
+            if (amount < parseFloat(state.minPurchase)) {
+                dom.actionBtn.disabled = true;
+                dom.actionBtnText.textContent = `Min ${state.minPurchase} USDT`;
+                return;
+            }
+
+            if (amount > parseFloat(state.maxPurchase)) {
+                dom.actionBtn.disabled = true;
+                dom.actionBtnText.textContent = `Max ${state.maxPurchase} USDT`;
+                return;
+            }
+
+            dom.actionBtn.disabled = false;
+            dom.actionBtnText.textContent = state.direction === 'buy' ? 'Buy OJOL' : 'Sell OJOL';
+        }
+
+        // ============================================================
+        // CALCULATE TRADE
+        // ============================================================
+        function calculateTrade() {
+            const amount = parseFloat(dom.fromInput.value);
+            if (!amount || amount <= 0) {
+                dom.toInput.value = '';
+                return;
+            }
+
+            let result = 0;
+            if (state.direction === 'buy') {
+                // USDT -> OJOL
+                result = amount / parseFloat(state.rate);
+                if (state.isWhitelisted) {
+                    result = result * 1.2; // 20% bonus
+                }
+                dom.toInput.value = formatNumber(result, 6);
+            } else {
+                // OJOL -> USDT
+                result = amount * parseFloat(state.rate);
+                const fee = result * 0.05; // 5% fee
+                result = result - fee;
+                dom.toInput.value = formatNumber(result, 4);
+            }
+        }
+
+        // ============================================================
+        // EXECUTE TRADE
+        // ============================================================
+        async function executeTrade() {
+            if (!state.connected || state.isLoading) return;
+
+            const amount = parseFloat(dom.fromInput.value);
+            if (!amount || amount <= 0) {
+                showToast('Please enter a valid amount', 'error');
+                return;
+            }
+
+            state.isLoading = true;
+            dom.actionBtn.disabled = true;
+            dom.actionBtn.innerHTML = `<span class="spinner"></span> Processing...`;
+
+            try {
+                const { treasury, ojol, usdt } = getContracts(state.web3);
+                const amountWei = toWei(amount, state.direction === 'buy' ? state.usdtDecimals : state.ojolDecimals);
+
+                if (state.direction === 'buy') {
+                    // BUY OJOL: Approve USDT first
+                    const allowance = await usdt.methods.allowance(state.account, CONFIG.treasuryAddress).call();
+                    if (parseInt(allowance) < parseInt(amountWei)) {
+                        showToast('Approving USDT...', 'info', 3000);
+                        const approveTx = await usdt.methods.approve(CONFIG.treasuryAddress, amountWei).send({
+                            from: state.account
+                        });
+                        console.log('Approval tx:', approveTx.transactionHash);
+                        showToast('USDT approved!', 'success', 2000);
+                    }
+
+                    // Execute buy
+                    showToast('Buying OJOL...', 'info', 3000);
+                    const tx = await treasury.methods.buyOJOL(amountWei.toString()).send({
+                        from: state.account
+                    });
+
+                    showToast(`✅ Bought ${dom.toInput.value} OJOL!`, 'success');
+                    addHistory('buy', dom.toInput.value, amount, tx.transactionHash);
+
+                } else {
+                    // SELL OJOL: Approve OJOL first
+                    const allowance = await ojol.methods.allowance(state.account, CONFIG.treasuryAddress).call();
+                    if (parseInt(allowance) < parseInt(amountWei)) {
+                        showToast('Approving OJOL...', 'info', 3000);
+                        const approveTx = await ojol.methods.approve(CONFIG.treasuryAddress, amountWei).send({
+                            from: state.account
+                        });
+                        console.log('Approval tx:', approveTx.transactionHash);
+                        showToast('OJOL approved!', 'success', 2000);
+                    }
+
+                    // Execute sell
+                    showToast('Selling OJOL...', 'info', 3000);
+                    const tx = await treasury.methods.sellOJOL(amountWei.toString()).send({
+                        from: state.account
+                    });
+
+                    showToast(`✅ Sold OJOL for ${dom.toInput.value} USDT!`, 'success');
+                    addHistory('sell', amount, dom.toInput.value, tx.transactionHash);
+                }
+
+                // Reload data
+                await loadData();
+                updateUI();
+                dom.fromInput.value = '';
+                dom.toInput.value = '';
+
+            } catch (error) {
+                console.error('Trade error:', error);
+                let message = 'Transaction failed';
+                if (error.message.includes('user rejected')) {
+                    message = 'Transaction rejected by user';
+                } else if (error.message.includes('Insufficient')) {
+                    message = 'Insufficient balance or allowance';
+                } else if (error.message.includes('below minimum')) {
+                    message = `Minimum is ${state.minPurchase} USDT`;
+                } else if (error.message.includes('above maximum')) {
+                    message = `Maximum is ${state.maxPurchase} USDT`;
+                }
+                showToast(`❌ ${message}`, 'error');
+            } finally {
+                state.isLoading = false;
+                updateActionButton();
+                dom.actionBtn.innerHTML = `<i class="fas fa-arrow-right"></i> <span id="actionBtnText">${state.direction === 'buy' ? 'Buy OJOL' : 'Sell OJOL'}</span>`;
+            }
+        }
+
+        // ============================================================
+        // TRANSACTION HISTORY
+        // ============================================================
+        function addHistory(type, amount, value, txHash) {
+            const entry = {
+                type,
+                amount: parseFloat(amount),
+                value: parseFloat(value),
+                txHash,
+                timestamp: Date.now()
+            };
+
+            state.history.unshift(entry);
+            if (state.history.length > 20) state.history.pop();
+            renderHistory();
+            saveHistory();
+        }
+
+        function renderHistory() {
+            if (state.history.length === 0) {
+                dom.historyList.innerHTML = '<div class="history-empty">No transactions yet</div>';
+                return;
+            }
+
+            dom.historyList.innerHTML = state.history.map(h => `
+                <div class="history-item">
+                    <div class="h-left">
+                        <div class="h-icon ${h.type}">
+                            <i class="fas ${h.type === 'buy' ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                        </div>
+                        <div class="h-detail">
+                            <div class="h-main">${h.type === 'buy' ? 'Buy' : 'Sell'} OJOL</div>
+                            <div class="h-sub">${getTimeAgo(h.timestamp)} · <a href="${getExplorerUrl(h.txHash)}" target="_blank" style="color:#00a651;text-decoration:none;">View</a></div>
+                        </div>
+                    </div>
+                    <div class="h-right">
+                        <div class="h-amount">${formatNumber(h.amount, 4)} OJOL</div>
+                        <div class="h-usd">${formatNumber(h.value, 2)} USDT</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveHistory() {
+            try {
+                localStorage.setItem('ojolTradeHistory', JSON.stringify(state.history));
+            } catch (e) {}
+        }
+
+        function loadHistory() {
+            try {
+                const data = localStorage.getItem('ojolTradeHistory');
+                if (data) {
+                    state.history = JSON.parse(data);
+                    renderHistory();
+                }
+            } catch (e) {}
+        }
+
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+
+        // Connect button
+        dom.connectBtn.addEventListener('click', connectWallet);
+
+        // Direction toggle
+        document.querySelectorAll('.swap-direction .option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.swap-direction .option').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                state.direction = this.dataset.direction;
+                dom.fromInput.value = '';
+                dom.toInput.value = '';
+                updateUI();
+            });
+        });
+
+        // Swap icon
+        dom.swapIcon.addEventListener('click', () => {
+            const current = state.direction;
+            state.direction = current === 'buy' ? 'sell' : 'buy';
+            document.querySelectorAll('.swap-direction .option').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.direction === state.direction);
+            });
+            dom.fromInput.value = '';
+            dom.toInput.value = '';
+            updateUI();
+        });
+
+        // Input change
+        dom.fromInput.addEventListener('input', () => {
+            calculateTrade();
+            updateActionButton();
+        });
+
+        // Action button
+        dom.actionBtn.addEventListener('click', executeTrade);
+
+        // Clear history
+        dom.clearHistory.addEventListener('click', () => {
+            state.history = [];
+            renderHistory();
+            saveHistory();
+            showToast('History cleared', 'info');
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        async function init() {
+            loadHistory();
+
+            // Check if already connected
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                await connectWallet();
+            } else {
+                updateUI();
+            }
+
+            // Auto-refresh balances every 15 seconds
+            setInterval(async () => {
+                if (state.connected) {
+                    await loadData();
+                    updateUI();
+                }
+            }, 15000);
+        }
+
+        init();
+
+        // ============================================================
+        // KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !dom.actionBtn.disabled) {
+                executeTrade();
+            }
+        });
+
+        console.log('🚀 OJOL Trade App loaded!');
+        console.log('📊 Treasury Address:', CONFIG.treasuryAddress);
+        console.log('🪙 OJOL Address:', CONFIG.ojolAddress);
+        console.log('💰 USDT Address:', CONFIG.usdtAddress);
+    </script>
+
+</body>
+</html>
