@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trade OJOL Token</title>
-    <!-- Web3 -->
+    <!-- Web3 v1.10.0 -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -129,8 +129,13 @@
         }
 
         @keyframes pulse-dot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
         }
 
         .wallet-address {
@@ -181,10 +186,6 @@
             font-weight: 400;
             opacity: 0.7;
             margin-left: 4px;
-        }
-
-        .balance-card .value.loading {
-            opacity: 0.5;
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -402,7 +403,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* ===== TRANSACTION HISTORY ===== */
@@ -531,9 +534,15 @@
             font-size: 14px;
         }
 
-        .toast.success { background: #065f46; }
-        .toast.error { background: #991b1b; }
-        .toast.info { background: #1e3a5f; }
+        .toast.success {
+            background: #065f46;
+        }
+        .toast.error {
+            background: #991b1b;
+        }
+        .toast.info {
+            background: #1e3a5f;
+        }
 
         .toast i {
             font-size: 18px;
@@ -549,23 +558,47 @@
         }
 
         @keyframes slideIn {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
-            .header { padding: 18px 16px 16px; }
-            .header-title h1 { font-size: 18px; }
-            .main-content { padding: 16px; }
-            .trade-card { padding: 16px; }
-            .trade-card .input-wrap input { font-size: 22px; }
-            .balance-card .value { font-size: 16px; }
-            .wallet-btn { padding: 6px 12px; font-size: 12px; }
-            .toast-container { right: 10px; left: 10px; max-width: 100%; }
+            .header {
+                padding: 18px 16px 16px;
+            }
+            .header-title h1 {
+                font-size: 18px;
+            }
+            .main-content {
+                padding: 16px;
+            }
+            .trade-card {
+                padding: 16px;
+            }
+            .trade-card .input-wrap input {
+                font-size: 22px;
+            }
+            .balance-card .value {
+                font-size: 16px;
+            }
+            .wallet-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            .toast-container {
+                right: 10px;
+                left: 10px;
+                max-width: 100%;
+            }
         }
 
-        /* ===== STATUS BAR ===== */
         .status-bar {
             display: flex;
             justify-content: space-between;
@@ -631,7 +664,7 @@
             <div class="status-bar">
                 <span>
                     <span class="status-dot online" id="statusDot"></span>
-                    <span id="statusText">Connected to BSC</span>
+                    <span id="statusText">Connecting...</span>
                 </span>
                 <span id="blockNumber">Block: --</span>
             </div>
@@ -712,27 +745,104 @@
         const CONFIG = {
             chainId: 56,
             rpcUrl: 'https://bsc-dataseed.binance.org/',
-            treasuryAddress: '0xf593282F7E1d2a5ebcd6c956834ca3B81720E8a7', // SC TREASURY 
+            treasuryAddress: '0xf593282F7E1d2a5ebcd6c956834ca3B81720E8a7', // SC TREASURY
             ojolAddress: '0x0cCB00abb35109FF33F0AbaB1C07915900954695', // SC Ojol Token
-            usdtAddress: '0x55d398326f99059fF775485246999027B3197955', // SC Usdt
-            treasuryABI: [
-                'function buyOJOL(uint256 usdtAmount) external',
-                'function sellOJOL(uint256 ojolAmount) external',
-                'function rate() view returns (uint256)',
-                'function minPurchaseUSDT() view returns (uint256)',
-                'function maxPurchaseUSDT() view returns (uint256)',
-                'function getTreasuryBalance() view returns (uint256, uint256)',
-                'function isWhitelistedAddress(address) view returns (bool)',
-                'function paused() view returns (bool)'
-            ],
-            erc20ABI: [
-                'function balanceOf(address) view returns (uint256)',
-                'function approve(address, uint256) returns (bool)',
-                'function allowance(address, address) view returns (uint256)',
-                'function decimals() view returns (uint8)',
-                'function symbol() view returns (string)'
-            ]
+            usdtAddress: '0x55d398326f99059fF775485246999027B3197955', // SC Usdt 
         };
+
+        // ============================================================
+        // FULL ABI (untuk Web3.js v1.x)
+        // ============================================================
+        const TREASURY_ABI = [{
+            "inputs": [{ "internalType": "uint256", "name": "usdtAmount", "type": "uint256" }],
+            "name": "buyOJOL",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }, {
+            "inputs": [{ "internalType": "uint256", "name": "ojolAmount", "type": "uint256" }],
+            "name": "sellOJOL",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }, {
+            "inputs": [],
+            "name": "rate",
+            "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+            "stateMutability": "view",
+            "type": "function"
+        }, {
+            "inputs": [],
+            "name": "minPurchaseUSDT",
+            "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+            "stateMutability": "view",
+            "type": "function"
+        }, {
+            "inputs": [],
+            "name": "maxPurchaseUSDT",
+            "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+            "stateMutability": "view",
+            "type": "function"
+        }, {
+            "inputs": [],
+            "name": "getTreasuryBalance",
+            "outputs": [
+                { "internalType": "uint256", "name": "ojolBalance", "type": "uint256" },
+                { "internalType": "uint256", "name": "usdtBalance", "type": "uint256" }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }, {
+            "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+            "name": "isWhitelistedAddress",
+            "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+            "stateMutability": "view",
+            "type": "function"
+        }, {
+            "inputs": [],
+            "name": "paused",
+            "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+            "stateMutability": "view",
+            "type": "function"
+        }];
+
+        const ERC20_ABI = [{
+            "constant": true,
+            "inputs": [{ "name": "_owner", "type": "address" }],
+            "name": "balanceOf",
+            "outputs": [{ "name": "balance", "type": "uint256" }],
+            "type": "function"
+        }, {
+            "constant": false,
+            "inputs": [
+                { "name": "_spender", "type": "address" },
+                { "name": "_value", "type": "uint256" }
+            ],
+            "name": "approve",
+            "outputs": [{ "name": "success", "type": "bool" }],
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [
+                { "name": "_owner", "type": "address" },
+                { "name": "_spender", "type": "address" }
+            ],
+            "name": "allowance",
+            "outputs": [{ "name": "remaining", "type": "uint256" }],
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "decimals",
+            "outputs": [{ "name": "", "type": "uint8" }],
+            "type": "function"
+        }, {
+            "constant": true,
+            "inputs": [],
+            "name": "symbol",
+            "outputs": [{ "name": "", "type": "string" }],
+            "type": "function"
+        }];
 
         // ============================================================
         // STATE
@@ -860,9 +970,9 @@
         // CONTRACT HELPERS
         // ============================================================
         function getContracts(web3) {
-            const treasury = new web3.eth.Contract(CONFIG.treasuryABI, CONFIG.treasuryAddress);
-            const ojol = new web3.eth.Contract(CONFIG.erc20ABI, CONFIG.ojolAddress);
-            const usdt = new web3.eth.Contract(CONFIG.erc20ABI, CONFIG.usdtAddress);
+            const treasury = new web3.eth.Contract(TREASURY_ABI, CONFIG.treasuryAddress);
+            const ojol = new web3.eth.Contract(ERC20_ABI, CONFIG.ojolAddress);
+            const usdt = new web3.eth.Contract(ERC20_ABI, CONFIG.usdtAddress);
             return { treasury, ojol, usdt };
         }
 
@@ -885,7 +995,6 @@
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: `0x${CONFIG.chainId.toString(16)}` }]
                         });
-                        // Reload after switch
                         setTimeout(() => window.location.reload(), 1000);
                         return;
                     } catch (switchError) {
@@ -899,7 +1008,6 @@
                 state.connected = true;
                 state.web3 = new Web3(window.ethereum);
 
-                // Setup listeners
                 window.ethereum.on('accountsChanged', (newAccounts) => {
                     if (newAccounts.length === 0) {
                         disconnectWallet();
@@ -1018,7 +1126,7 @@
 
             } catch (error) {
                 console.error('Error loading data:', error);
-                showToast('Error loading contract data', 'error');
+                showToast('Error loading contract data: ' + error.message, 'error');
             }
         }
 
@@ -1117,14 +1225,12 @@
 
             let result = 0;
             if (state.direction === 'buy') {
-                // USDT -> OJOL
                 result = amount / parseFloat(state.rate);
                 if (state.isWhitelisted) {
                     result = result * 1.2;
                 }
                 dom.toInput.value = formatNumber(result, 6);
             } else {
-                // OJOL -> USDT
                 result = amount * parseFloat(state.rate);
                 const fee = result * 0.05;
                 result = result - fee;
@@ -1153,8 +1259,7 @@
 
                 if (state.direction === 'buy') {
                     const amountWei = toWei(amount, state.usdtDecimals);
-                    
-                    // Check allowance
+
                     const allowance = await usdt.methods.allowance(state.account, CONFIG.treasuryAddress).call();
                     if (BigInt(allowance) < BigInt(amountWei.toString())) {
                         showToast('Approving USDT...', 'info', 3000);
@@ -1174,8 +1279,7 @@
 
                 } else {
                     const amountWei = toWei(amount, state.ojolDecimals);
-                    
-                    // Check allowance
+
                     const allowance = await ojol.methods.allowance(state.account, CONFIG.treasuryAddress).call();
                     if (BigInt(allowance) < BigInt(amountWei.toString())) {
                         showToast('Approving OJOL...', 'info', 3000);
@@ -1213,7 +1317,8 @@
                 showToast(`❌ ${message}`, 'error');
             } finally {
                 state.isLoading = false;
-                dom.actionBtn.innerHTML = `<i class="fas fa-arrow-right"></i> <span id="actionBtnText">${state.direction === 'buy' ? 'Buy OJOL' : 'Sell OJOL'}</span>`;
+                dom.actionBtn.innerHTML =
+                    `<i class="fas fa-arrow-right"></i> <span id="actionBtnText">${state.direction === 'buy' ? 'Buy OJOL' : 'Sell OJOL'}</span>`;
                 updateActionButton();
             }
         }
@@ -1266,7 +1371,8 @@
         function loadHistory() {
             try {
                 const data = localStorage.getItem('ojolTradeHistory');
-                if (data) { state.history = JSON.parse(data); renderHistory(); }
+                if (data) { state.history = JSON.parse(data);
+                    renderHistory(); }
             } catch (e) {}
         }
 
@@ -1333,13 +1439,19 @@
                     if (accounts.length > 0) {
                         await connectWallet();
                     } else {
+                        dom.statusText.textContent = 'Not connected';
+                        dom.statusDot.className = 'status-dot offline';
                         updateUI();
                     }
                 } catch (e) {
                     console.warn('Auto-connect failed:', e);
+                    dom.statusText.textContent = 'Not connected';
+                    dom.statusDot.className = 'status-dot offline';
                     updateUI();
                 }
             } else {
+                dom.statusText.textContent = '⚠️ Install MetaMask';
+                dom.statusDot.className = 'status-dot offline';
                 updateUI();
                 showToast('Please install MetaMask', 'info', 5000);
             }
@@ -1353,7 +1465,7 @@
         }
 
         // ============================================================
-        // DEBUG HELPER
+        // DEBUG
         // ============================================================
         console.log('🚀 OJOL Trade App loaded!');
         console.log('📊 Treasury Address:', CONFIG.treasuryAddress);
