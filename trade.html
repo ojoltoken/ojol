@@ -151,38 +151,38 @@
         /* ===== BALANCE DISPLAY ===== */
         .balance-display {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
             margin-top: 8px;
         }
 
         .balance-card {
             background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(4px);
-            padding: 12px 16px;
+            padding: 10px 12px;
             border-radius: 14px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .balance-card .label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 500;
             opacity: 0.7;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
 
         .balance-card .value {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 700;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .balance-card .value .small {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 400;
             opacity: 0.7;
             margin-left: 4px;
@@ -190,7 +190,7 @@
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
-            padding: 20px 24px 28px;
+            padding: 16px 20px 24px;
         }
 
         /* ===== TOGGLE SWAP ===== */
@@ -199,17 +199,17 @@
             background: #f0fdf4;
             border-radius: 16px;
             padding: 4px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             position: relative;
         }
 
         .swap-direction .option {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
             border-radius: 13px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.3s ease;
             color: #6b7280;
@@ -227,16 +227,16 @@
         }
 
         .swap-direction .option i {
-            margin-right: 8px;
+            margin-right: 6px;
         }
 
         /* ===== TRADE CARD ===== */
         .trade-card {
             background: #f9fdfb;
             border: 1px solid #e5f0e8;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
             transition: all 0.3s;
         }
 
@@ -249,17 +249,17 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .trade-card .label-row .label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: #374151;
         }
 
         .trade-card .label-row .balance {
-            font-size: 12px;
+            font-size: 11px;
             color: #6b7280;
             font-weight: 500;
         }
@@ -267,14 +267,14 @@
         .trade-card .input-wrap {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .trade-card .input-wrap input {
             flex: 1;
             border: none;
             background: transparent;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             color: #1f2937;
             outline: none;
@@ -294,11 +294,11 @@
         }
 
         .trade-card .input-wrap .token-symbol {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             color: #065f46;
             background: #e5f0e8;
-            padding: 6px 14px;
+            padding: 4px 12px;
             border-radius: 100px;
             display: flex;
             align-items: center;
@@ -307,7 +307,7 @@
         }
 
         .trade-card .input-wrap .token-symbol i {
-            font-size: 14px;
+            font-size: 12px;
         }
 
         /* ===== RATE DISPLAY ===== */
@@ -315,25 +315,25 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 12px;
-            padding: 8px 0 12px;
+            gap: 10px;
+            padding: 6px 0 10px;
             color: #6b7280;
-            font-size: 13px;
+            font-size: 12px;
             flex-wrap: wrap;
         }
 
         .rate-display .rate-value {
             background: #f0fdf4;
-            padding: 4px 14px;
+            padding: 4px 12px;
             border-radius: 100px;
             font-weight: 600;
             color: #065f46;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .rate-display .swap-icon {
             color: #00a651;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             transition: transform 0.3s;
         }
@@ -345,28 +345,28 @@
         .whitelist-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             background: #d1fae5;
             color: #065f46;
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 100px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
         }
 
         .whitelist-badge i {
-            font-size: 10px;
+            font-size: 9px;
         }
 
         /* ===== ACTION BUTTON ===== */
         .action-btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: linear-gradient(135deg, #00a651 0%, #008844 100%);
             color: white;
             border: none;
-            border-radius: 16px;
-            font-size: 16px;
+            border-radius: 14px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
@@ -374,7 +374,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .action-btn:hover:not(:disabled) {
@@ -394,8 +394,8 @@
         }
 
         .action-btn .spinner {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
@@ -410,20 +410,20 @@
 
         /* ===== TRANSACTION HISTORY ===== */
         .history-section {
-            margin-top: 20px;
+            margin-top: 16px;
             border-top: 1px solid #e5f0e8;
-            padding-top: 16px;
+            padding-top: 14px;
         }
 
         .history-section .history-title {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .history-section .history-title h3 {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #374151;
         }
@@ -432,7 +432,7 @@
             background: none;
             border: none;
             color: #6b7280;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
         }
@@ -441,9 +441,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #f0fdf4;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .history-item:last-child {
@@ -453,17 +453,17 @@
         .history-item .h-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .history-item .h-left .h-icon {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .history-item .h-left .h-icon.buy {
@@ -482,7 +482,7 @@
         }
 
         .history-item .h-left .h-detail .h-sub {
-            font-size: 11px;
+            font-size: 10px;
             color: #6b7280;
         }
 
@@ -493,10 +493,11 @@
 
         .history-item .h-right .h-amount {
             color: #1f2937;
+            font-size: 12px;
         }
 
         .history-item .h-right .h-usd {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 400;
             color: #6b7280;
         }
@@ -504,8 +505,8 @@
         .history-empty {
             text-align: center;
             color: #9ca3af;
-            font-size: 13px;
-            padding: 20px 0;
+            font-size: 12px;
+            padding: 16px 0;
         }
 
         /* ===== TOAST ===== */
@@ -524,14 +525,14 @@
         .toast {
             background: #1f2937;
             color: white;
-            padding: 14px 20px;
-            border-radius: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             animation: slideIn 0.4s ease;
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 14px;
+            gap: 10px;
+            font-size: 13px;
         }
 
         .toast.success {
@@ -543,9 +544,12 @@
         .toast.info {
             background: #1e3a5f;
         }
+        .toast.warning {
+            background: #92400e;
+        }
 
         .toast i {
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .toast .toast-close {
@@ -554,7 +558,7 @@
             border: none;
             color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         @keyframes slideIn {
@@ -571,26 +575,35 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .header {
-                padding: 18px 16px 16px;
+                padding: 16px 14px 14px;
             }
             .header-title h1 {
+                font-size: 16px;
+            }
+            .header-title .logo {
+                width: 36px;
+                height: 36px;
                 font-size: 18px;
             }
             .main-content {
-                padding: 16px;
+                padding: 12px 14px 18px;
             }
             .trade-card {
-                padding: 16px;
+                padding: 12px;
             }
             .trade-card .input-wrap input {
-                font-size: 22px;
+                font-size: 20px;
             }
             .balance-card .value {
-                font-size: 16px;
+                font-size: 14px;
+            }
+            .balance-display {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 6px;
             }
             .wallet-btn {
-                padding: 6px 12px;
-                font-size: 12px;
+                padding: 4px 10px;
+                font-size: 11px;
             }
             .toast-container {
                 right: 10px;
@@ -603,8 +616,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0 4px;
-            font-size: 11px;
+            padding: 6px 0 2px;
+            font-size: 10px;
             color: #6b7280;
         }
 
@@ -622,6 +635,28 @@
 
         .status-bar .status-dot.offline {
             background: #f87171;
+        }
+
+        /* ===== GAS WARNING ===== */
+        .gas-warning {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #92400e;
+        }
+
+        .gas-warning.show {
+            display: flex;
+        }
+
+        .gas-warning i {
+            font-size: 14px;
         }
     </style>
 </head>
@@ -648,12 +683,16 @@
             <!-- Balance Display -->
             <div class="balance-display">
                 <div class="balance-card">
-                    <div class="label"><i class="fas fa-coins"></i> OJOL Balance</div>
-                    <div class="value" id="ojolBalance">0.00 <span class="small">OJOL</span></div>
+                    <div class="label"><i class="fas fa-coins"></i> OJOL</div>
+                    <div class="value" id="ojolBalance">0.00</div>
                 </div>
                 <div class="balance-card">
-                    <div class="label"><i class="fas fa-dollar-sign"></i> USDT Balance</div>
-                    <div class="value" id="usdtBalance">0.00 <span class="small">USDT</span></div>
+                    <div class="label"><i class="fas fa-dollar-sign"></i> USDT</div>
+                    <div class="value" id="usdtBalance">0.00</div>
+                </div>
+                <div class="balance-card">
+                    <div class="label"><i class="fab fa-bnb"></i> BNB</div>
+                    <div class="value" id="bnbBalance">0.00</div>
                 </div>
             </div>
         </header>
@@ -667,6 +706,12 @@
                     <span id="statusText">Connecting...</span>
                 </span>
                 <span id="blockNumber">Block: --</span>
+            </div>
+
+            <!-- Gas Warning -->
+            <div class="gas-warning" id="gasWarning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="gasWarningText">Insufficient BNB for gas fee. Please add BNB to your wallet.</span>
             </div>
 
             <!-- Swap Direction Toggle -->
@@ -698,7 +743,7 @@
                 <span class="rate-value" id="rateDisplay">Loading rate...</span>
                 <i class="fas fa-exchange-alt swap-icon" id="swapIcon" title="Swap direction"></i>
                 <span id="whitelistBadge" class="whitelist-badge" style="display:none;">
-                    <i class="fas fa-star"></i> +20% Bonus
+                    <i class="fas fa-star"></i> +20%
                 </span>
             </div>
 
@@ -725,8 +770,8 @@
             <!-- Transaction History -->
             <div class="history-section">
                 <div class="history-title">
-                    <h3><i class="fas fa-clock-rotate-left"></i> Recent Transactions</h3>
-                    <button class="clear-btn" id="clearHistory">Clear All</button>
+                    <h3><i class="fas fa-clock-rotate-left"></i> Recent</h3>
+                    <button class="clear-btn" id="clearHistory">Clear</button>
                 </div>
                 <div id="historyList">
                     <div class="history-empty">No transactions yet</div>
@@ -740,18 +785,18 @@
 
     <script>
         // ============================================================
-        // CONFIGURATION - GANTI DENGAN ADDRESS TREASURY ANDA!
+        // CONFIGURATION
         // ============================================================
         const CONFIG = {
             chainId: 56,
-            rpcUrl: 'https://bsc-dataseed.binance.org/',
-            treasuryAddress: '0xf593282F7E1d2a5ebcd6c956834ca3B81720E8a7', // SC TREASURY
+            rpcUrl: 'https://bsc-dataseed.binance.com/',
+            treasuryAddress: '0xf593282F7E1d2a5ebcd6c956834ca3B81720E8a7', // SC TREASURY 
             ojolAddress: '0x0cCB00abb35109FF33F0AbaB1C07915900954695', // SC Ojol Token
-            usdtAddress: '0x55d398326f99059fF775485246999027B3197955', // SC Usdt 
+            usdtAddress: '0x55d398326f99059fF775485246999027B3197955', // SC USDT
         };
 
         // ============================================================
-        // FULL ABI (untuk Web3.js v1.x)
+        // FULL ABI
         // ============================================================
         const TREASURY_ABI = [{
             "inputs": [{ "internalType": "uint256", "name": "usdtAmount", "type": "uint256" }],
@@ -855,6 +900,7 @@
             direction: 'buy',
             ojolBalance: '0',
             usdtBalance: '0',
+            bnbBalance: '0',
             rate: '0',
             minPurchase: '10',
             maxPurchase: '1000',
@@ -864,6 +910,7 @@
             history: [],
             ojolDecimals: 18,
             usdtDecimals: 18,
+            bnbDecimals: 18,
             ojolSymbol: 'OJOL',
             usdtSymbol: 'USDT',
             blockNumber: 0
@@ -878,6 +925,7 @@
             walletBtnText: $('walletBtnText'),
             ojolBalance: $('ojolBalance'),
             usdtBalance: $('usdtBalance'),
+            bnbBalance: $('bnbBalance'),
             fromInput: $('fromInput'),
             toInput: $('toInput'),
             fromLabel: $('fromLabel'),
@@ -897,7 +945,9 @@
             toastContainer: $('toastContainer'),
             statusText: $('statusText'),
             statusDot: $('statusDot'),
-            blockNumber: $('blockNumber')
+            blockNumber: $('blockNumber'),
+            gasWarning: $('gasWarning'),
+            gasWarningText: $('gasWarningText')
         };
 
         // ============================================================
@@ -943,12 +993,14 @@
             const icons = {
                 success: 'fa-circle-check',
                 error: 'fa-circle-xmark',
-                info: 'fa-circle-info'
+                info: 'fa-circle-info',
+                warning: 'fa-triangle-exclamation'
             };
             const colors = {
                 success: '#065f46',
                 error: '#991b1b',
-                info: '#1e3a5f'
+                info: '#1e3a5f',
+                warning: '#92400e'
             };
 
             const toast = document.createElement('div');
@@ -974,6 +1026,29 @@
             const ojol = new web3.eth.Contract(ERC20_ABI, CONFIG.ojolAddress);
             const usdt = new web3.eth.Contract(ERC20_ABI, CONFIG.usdtAddress);
             return { treasury, ojol, usdt };
+        }
+
+        // ============================================================
+        // CHECK BNB BALANCE
+        // ============================================================
+        async function checkBnbBalance() {
+            if (!state.connected || !state.web3) return;
+            try {
+                const balance = await state.web3.eth.getBalance(state.account);
+                state.bnbBalance = fromWei(balance, 18);
+                dom.bnbBalance.textContent = formatNumber(state.bnbBalance, 4);
+
+                // Show warning if BNB < 0.005
+                if (parseFloat(state.bnbBalance) < 0.005) {
+                    dom.gasWarning.classList.add('show');
+                    dom.gasWarningText.textContent =
+                        `⚠️ Low BNB balance (${formatNumber(state.bnbBalance, 4)} BNB). Need ~0.005 BNB for gas fees.`;
+                } else {
+                    dom.gasWarning.classList.remove('show');
+                }
+            } catch (e) {
+                console.warn('Error checking BNB balance:', e);
+            }
         }
 
         // ============================================================
@@ -1048,10 +1123,12 @@
             dom.actionBtnText.textContent = 'Connect Wallet';
             dom.statusText.textContent = 'Disconnected';
             dom.statusDot.className = 'status-dot offline';
-            dom.ojolBalance.innerHTML = '0.00 <span class="small">OJOL</span>';
-            dom.usdtBalance.innerHTML = '0.00 <span class="small">USDT</span>';
+            dom.ojolBalance.textContent = '0.00';
+            dom.usdtBalance.textContent = '0.00';
+            dom.bnbBalance.textContent = '0.00';
             dom.fromBalance.textContent = 'Balance: 0.00';
             dom.toBalance.textContent = 'Balance: 0.00';
+            dom.gasWarning.classList.remove('show');
         }
 
         // ============================================================
@@ -1082,6 +1159,9 @@
                 } catch (e) {
                     console.warn('Error loading balances:', e);
                 }
+
+                // Check BNB balance
+                await checkBnbBalance();
 
                 // Load rate
                 try {
@@ -1135,8 +1215,9 @@
         // ============================================================
         function updateUI() {
             // Balances
-            dom.ojolBalance.innerHTML = `${formatNumber(state.ojolBalance, 4)} <span class="small">OJOL</span>`;
-            dom.usdtBalance.innerHTML = `${formatNumber(state.usdtBalance, 2)} <span class="small">USDT</span>`;
+            dom.ojolBalance.textContent = formatNumber(state.ojolBalance, 4);
+            dom.usdtBalance.textContent = formatNumber(state.usdtBalance, 2);
+            dom.bnbBalance.textContent = formatNumber(state.bnbBalance, 4);
 
             // Rate
             dom.rateDisplay.textContent = `1 OJOL = ${formatNumber(state.rate, 4)} USDT`;
@@ -1181,6 +1262,18 @@
                 dom.actionBtn.disabled = true;
                 dom.actionBtnText.textContent = '⚠️ Contract Paused';
                 return;
+            }
+
+            // Check BNB for gas
+            if (parseFloat(state.bnbBalance) < 0.003) {
+                dom.actionBtn.disabled = true;
+                dom.actionBtnText.textContent = '⚠️ Insufficient BNB for gas';
+                dom.gasWarning.classList.add('show');
+                dom.gasWarningText.textContent =
+                    `⚠️ Need ~0.003-0.005 BNB for gas. Current: ${formatNumber(state.bnbBalance, 4)} BNB`;
+                return;
+            } else {
+                dom.gasWarning.classList.remove('show');
             }
 
             const amount = parseFloat(dom.fromInput.value);
@@ -1239,6 +1332,21 @@
         }
 
         // ============================================================
+        // ESTIMATE GAS
+        // ============================================================
+        async function estimateGas(method, args, from) {
+            try {
+                const gasEstimate = await method(...args).estimateGas({ from });
+                // Add 20% buffer for safety
+                return Math.floor(Number(gasEstimate) * 1.2);
+            } catch (error) {
+                console.warn('Gas estimation failed:', error);
+                // Fallback to default gas limit
+                return 300000;
+            }
+        }
+
+        // ============================================================
         // EXECUTE TRADE
         // ============================================================
         async function executeTrade() {
@@ -1247,6 +1355,13 @@
             const amount = parseFloat(dom.fromInput.value);
             if (!amount || amount <= 0) {
                 showToast('Please enter a valid amount', 'error');
+                return;
+            }
+
+            // Check BNB balance again
+            await checkBnbBalance();
+            if (parseFloat(state.bnbBalance) < 0.003) {
+                showToast('❌ Insufficient BNB for gas. Please add BNB to your wallet.', 'error');
                 return;
             }
 
@@ -1260,18 +1375,29 @@
                 if (state.direction === 'buy') {
                     const amountWei = toWei(amount, state.usdtDecimals);
 
+                    // Check allowance
                     const allowance = await usdt.methods.allowance(state.account, CONFIG.treasuryAddress).call();
                     if (BigInt(allowance) < BigInt(amountWei.toString())) {
                         showToast('Approving USDT...', 'info', 3000);
                         const approveTx = await usdt.methods.approve(CONFIG.treasuryAddress, amountWei.toString()).send({
-                            from: state.account
+                            from: state.account,
+                            gas: 100000 // Approval uses less gas
                         });
                         showToast('USDT approved!', 'success', 2000);
                     }
 
                     showToast('Buying OJOL...', 'info', 3000);
+
+                    // Estimate gas
+                    const gasLimit = await estimateGas(
+                        treasury.methods.buyOJOL,
+                        [amountWei.toString()],
+                        state.account
+                    );
+
                     const tx = await treasury.methods.buyOJOL(amountWei.toString()).send({
-                        from: state.account
+                        from: state.account,
+                        gas: gasLimit
                     });
 
                     showToast(`✅ Bought ${dom.toInput.value} OJOL!`, 'success');
@@ -1280,18 +1406,29 @@
                 } else {
                     const amountWei = toWei(amount, state.ojolDecimals);
 
+                    // Check allowance
                     const allowance = await ojol.methods.allowance(state.account, CONFIG.treasuryAddress).call();
                     if (BigInt(allowance) < BigInt(amountWei.toString())) {
                         showToast('Approving OJOL...', 'info', 3000);
                         const approveTx = await ojol.methods.approve(CONFIG.treasuryAddress, amountWei.toString()).send({
-                            from: state.account
+                            from: state.account,
+                            gas: 100000
                         });
                         showToast('OJOL approved!', 'success', 2000);
                     }
 
                     showToast('Selling OJOL...', 'info', 3000);
+
+                    // Estimate gas
+                    const gasLimit = await estimateGas(
+                        treasury.methods.sellOJOL,
+                        [amountWei.toString()],
+                        state.account
+                    );
+
                     const tx = await treasury.methods.sellOJOL(amountWei.toString()).send({
-                        from: state.account
+                        from: state.account,
+                        gas: gasLimit
                     });
 
                     showToast(`✅ Sold OJOL for ${dom.toInput.value} USDT!`, 'success');
@@ -1304,7 +1441,10 @@
 
             } catch (error) {
                 console.error('Trade error:', error);
+
                 let message = 'Transaction failed';
+                let type = 'error';
+
                 if (error.message.includes('user rejected')) {
                     message = 'Transaction rejected by user';
                 } else if (error.message.includes('Insufficient')) {
@@ -1313,8 +1453,18 @@
                     message = `Minimum is ${formatNumber(state.minPurchase, 2)} USDT`;
                 } else if (error.message.includes('above maximum')) {
                     message = `Maximum is ${formatNumber(state.maxPurchase, 2)} USDT`;
+                } else if (error.message.includes('gas')) {
+                    message = 'Gas estimation failed. Please try again or increase gas limit.';
+                    type = 'warning';
+                } else if (error.message.includes('out of gas')) {
+                    message = 'Transaction out of gas. Please try again.';
+                    type = 'warning';
+                } else if (error.message.includes('BNB')) {
+                    message = 'Insufficient BNB for gas. Please add BNB to your wallet.';
+                    type = 'warning';
                 }
-                showToast(`❌ ${message}`, 'error');
+
+                showToast(`❌ ${message}`, type);
             } finally {
                 state.isLoading = false;
                 dom.actionBtn.innerHTML =
@@ -1432,7 +1582,6 @@
         async function init() {
             loadHistory();
 
-            // Check if already connected
             if (window.ethereum) {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
@@ -1471,7 +1620,6 @@
         console.log('📊 Treasury Address:', CONFIG.treasuryAddress);
         console.log('🪙 OJOL Address:', CONFIG.ojolAddress);
         console.log('💰 USDT Address:', CONFIG.usdtAddress);
-        console.log('💡 Pastikan treasuryAddress sudah diganti dengan address yang benar!');
 
         if (CONFIG.treasuryAddress === '0x...') {
             console.warn('⚠️ PERINGATAN: treasuryAddress masih default! Ganti dengan address treasury Anda!');
