@@ -1265,12 +1265,12 @@
             }
 
             // Check BNB for gas
-            if (parseFloat(state.bnbBalance) < 0.003) {
+            if (parseFloat(state.bnbBalance) < 0.001) {
                 dom.actionBtn.disabled = true;
                 dom.actionBtnText.textContent = '⚠️ Insufficient BNB for gas';
                 dom.gasWarning.classList.add('show');
                 dom.gasWarningText.textContent =
-                    `⚠️ Need ~0.003-0.005 BNB for gas. Current: ${formatNumber(state.bnbBalance, 4)} BNB`;
+                    `⚠️ Need ~0.001-0.002 BNB for gas. Current: ${formatNumber(state.bnbBalance, 4)} BNB`;
                 return;
             } else {
                 dom.gasWarning.classList.remove('show');
