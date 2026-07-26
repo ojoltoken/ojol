@@ -1039,10 +1039,10 @@
                 dom.bnbBalance.textContent = formatNumber(state.bnbBalance, 4);
 
                 // Show warning if BNB < 0.005
-                if (parseFloat(state.bnbBalance) < 0.005) {
+                if (parseFloat(state.bnbBalance) < 0.001) {
                     dom.gasWarning.classList.add('show');
                     dom.gasWarningText.textContent =
-                        `⚠️ Low BNB balance (${formatNumber(state.bnbBalance, 4)} BNB). Need ~0.005 BNB for gas fees.`;
+                        `⚠️ Low BNB balance (${formatNumber(state.bnbBalance, 4)} BNB). Need ~0.001 BNB for gas fees.`;
                 } else {
                     dom.gasWarning.classList.remove('show');
                 }
