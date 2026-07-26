@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ojol Staking V5 | Dashboard Driver</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f9f0;
+            color: #1e293b;
+            padding-bottom: 2rem;
+        }
+        :root {
+            --primary: #00A651;
+            --primary-dark: #008a43;
+            --card-white: #ffffff;
+            --shadow-sm: 0 8px 20px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .container { max-width: 700px; margin: 0 auto; padding: 1rem 1.2rem 2rem; }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0.5rem 0 1rem 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-white);
+            padding: 0.4rem 1rem 0.4rem 0.8rem;
+            border-radius: 60px;
+            box-shadow: var(--shadow-sm);
+        }
+        .logo-img {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #00A651, #008a43);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-img i { font-size: 26px; color: white; }
+        .logo-text { font-weight: 800; font-size: 1.3rem; }
+        .logo-text span { color: var(--primary); }
+        .connect-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .connect-btn:hover { background: var(--primary-dark); transform: scale(0.97); }
+        .card {
+            background: var(--card-white);
+            border-radius: 32px;
+            padding: 1.3rem 1.2rem;
+            margin-bottom: 1.2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #eef2e6;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+            padding-left: 12px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .stat-item {
+            background: #fafdf7;
+            border-radius: 24px;
+            padding: 0.8rem;
+        }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; color: #5b6e4a; }
+        .stat-value { font-weight: 800; font-size: 1.3rem; color: #0f172a; }
+        .small-value { font-size: 0.9rem; }
+        input, select {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 60px;
+            border: 1px solid #e2e8d5;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            background: white;
+            font-family: monospace;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300A651' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+        select option { font-family: 'Inter', sans-serif; padding: 8px; }
+        button.primary-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: 700;
+            padding: 0.9rem;
+            border-radius: 60px;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        button.primary-btn:active { transform: scale(0.97); }
+        button.primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        button.outline-btn {
+            background: transparent;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #ecf3e5;
+        }
+        .info-row .label {
+            font-weight: 500;
+            color: #4a5a6a;
+            white-space: nowrap;
+        }
+        .info-row .value {
+            text-align: right;
+            font-weight: 600;
+            color: #0a1a2a;
+            word-break: break-word;
+        }
+        /* ===== PERBAIKAN TAMPILAN DURASI DI MOBILE ===== */
+        .info-row.duration-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 4px;
+            padding: 8px 0;
+        }
+        .info-row.duration-row .label {
+            font-size: 0.8rem;
+            color: #5a6a7a;
+        }
+        .info-row.duration-row .value {
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0a1a2a;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .info-row.duration-row .value .date-range {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .info-row.duration-row .value .date-range .date-item {
+            background: #f1f5f9;
+            padding: 2px 10px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1a2a3a;
+            white-space: nowrap;
+        }
+        .info-row.duration-row .value .date-range .arrow {
+            color: #00A651;
+            font-size: 0.7rem;
+        }
+        .info-row.duration-row .value .duration-label {
+            font-size: 0.7rem;
+            color: #00A651;
+            font-weight: 700;
+        }
+        .flex-btns { display: flex; gap: 12px; }
+        .approval-row {
+            background: #f0fde8;
+            border-radius: 28px;
+            padding: 12px 15px;
+            margin: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .btn-small {
+            padding: 8px 20px;
+            border-radius: 40px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .btn-small:active { transform: scale(0.95); }
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #1e293b;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 40px;
+            z-index: 999;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+        .green-badge {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 4px 12px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        footer { text-align: center; font-size: 0.7rem; color: #8ba36b; margin-top: 1rem; }
+        .wallet-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            background: #ffffffcc;
+            padding: 8px 14px;
+            border-radius: 40px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(2px);
+            border: 1px solid #e2e8d5;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .wallet-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .wallet-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        @media (max-width: 500px) { 
+            .container { padding: 0.8rem; }
+            .info-row.duration-row .value .date-range .date-item {
+                font-size: 0.7rem;
+                padding: 2px 8px;
+            }
+            .info-row.duration-row .value .duration-label {
+                font-size: 0.65rem;
+            }
+        }
+        .address-badge {
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        .downline-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-radius: 16px;
+            margin-bottom: 8px;
+            border: 1px solid #eef2e6;
+        }
+        .downline-addr {
+            font-family: monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .downline-bonus {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #00A651;
+        }
+        .claim-btn-mini {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .claim-btn-mini:hover { background: var(--primary-dark); }
+        .claim-btn-mini:disabled { opacity: 0.5; cursor: not-allowed; }
+        .no-downline {
+            text-align: center;
+            color: #94a3b8;
+            padding: 20px 0;
+            font-size: 0.85rem;
+        }
+        .referral-link-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 4px 4px 4px 16px;
+            border-radius: 40px;
+            border: 1px solid #e2e8d5;
+            flex-wrap: wrap;
+        }
+        .referral-link-container input {
+            border: none;
+            background: transparent;
+            padding: 6px 0;
+            font-size: 0.75rem;
+            font-family: monospace;
+            flex: 1;
+            min-width: 150px;
+            margin-bottom: 0;
+        }
+        .referral-link-container input:focus { outline: none; }
+        .ref-badge {
+            background: #fff3e0;
+            color: #e65100;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .copy-btn:hover { background: var(--primary-dark); }
+        .share-btn {
+            background: #1a8cd8;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .share-btn:hover { background: #1573b8; }
+        .ref-link-card {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1px solid #bbf7d0;
+        }
+        .ref-link-card .card-title { border-left-color: #16a34a; }
+        .status-badge {
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .status-active { background: #dcfce7; color: #15803d; }
+        .status-completed { background: #e5e7eb; color: #4b5563; }
+        .status-pending { background: #fef3c7; color: #b45309; }
+        .history-item {
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #eef2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .history-item .date { font-size: 0.75rem; color: #64748b; }
+        .history-item .amount { font-weight: 700; color: #0f172a; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-img"><i class="fas fa-motorcycle"></i></div>
+            <div class="logo-text">Ojol<span>Staking</span></div>
+        </div>
+        <button id="connectWalletBtn" class="connect-btn"><i class="fas fa-wallet"></i> <span id="walletBtnText">Connect Wallet</span></button>
+    </div>
+    
+    <div class="wallet-info" id="walletStatusPanel">
+        <div class="wallet-left">
+            <span id="walletShort">⚡ Not connected</span>
+        </div>
+        <div class="wallet-right">
+            <span><i class="fas fa-coins" style="color:#00A651;"></i> <strong id="ojolBalance">0.00</strong> OJOL</span>
+            <span><i class="fas fa-gas-pump"></i> <span id="nativeBalance">0</span> ETH</span>
+        </div>
+    </div>
+
+    <!-- Card Referral Link -->
+    <div class="card ref-link-card" id="refLinkCard" style="display: none;">
+        <div class="card-title"><i class="fas fa-link" style="color:#16a34a;"></i> Referral Link</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span class="ref-badge"><i class="fas fa-user-plus"></i> Your Referral</span>
+                <div class="referral-link-container" style="flex: 1;">
+                    <input type="text" id="referralLinkInput" readonly value="">
+                    <button id="copyRefLinkBtn" class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                    <button id="shareRefLinkBtn" class="share-btn"><i class="fas fa-share-alt"></i> Share</button>
+                </div>
+            </div>
+            <div style="font-size: 0.7rem; color: #64748b; padding: 0 8px;">
+                <i class="fas fa-info-circle"></i> Bagikan link ini untuk mendapatkan komisi referral
+            </div>
+        </div>
+    </div>
+
+    <!-- Staking utama -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-hand-holding-usd" style="color:#00A651;"></i> My Stake & Reward</div>
+        <div class="stats-grid">
+            <div class="stat-item"><div class="stat-label">Staked Amount</div><div class="stat-value" id="myStakeAmount">0 OJOL</div></div>
+            <div class="stat-item"><div class="stat-label">Pending Reward</div><div class="stat-value" id="pendingReward">0</div></div>
+            <div class="stat-item"><div class="stat-label">Total Claimed</div><div class="stat-value small-value" id="totalClaimedReward">0</div></div>
+            <div class="stat-item"><div class="stat-label">Status</div><div class="stat-value small-value" id="stakeStatus"><span class="status-badge status-pending">No Stake</span></div></div>
+        </div>
+        <div class="info-row"><span class="label">📈 Reward Rate</span><span class="value" id="rewardRateDisplay">Loading...</span></div>
+        <!-- PERBAIKAN: Info row untuk durasi dengan layout yang lebih rapi -->
+        <div class="info-row duration-row" id="durationRow">
+            <span class="label">⏳ Periode Staking</span>
+            <div class="value" id="durationDisplay">
+                <span class="duration-label">Belum ada staking aktif</span>
+            </div>
+        </div>
+        <div class="flex-btns" style="margin-top: 12px;">
+            <button id="claimRewardBtn" class="primary-btn" style="background:#2c7a47;" disabled><i class="fas fa-gift"></i> Claim Reward</button>
+            <button id="withdrawBtn" class="primary-btn outline-btn" disabled><i class="fas fa-sign-out-alt"></i> Withdraw</button>
+        </div>
+        <button id="earlyWithdrawBtn" class="outline-btn" style="border-color:#dc2626; color:#dc2626; margin-top:6px;" disabled><i class="fas fa-exclamation-triangle"></i> Early Withdraw (Penalty)</button>
+    </div>
+
+    <!-- Form Stake + Approval -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-plus-circle"></i> New Stake & Referral</div>
+        <input type="number" id="stakeAmount" placeholder="Amount OJOL (contoh: 100)" value="100" step="any">
+        <select id="durationDays">
+            <option value="30">30 days</option>
+            <option value="90">90 days</option>
+            <option value="180">180 days</option>
+            <option value="360">360 days</option>
+        </select>
+        <input type="text" id="referrerAddr" placeholder="Referrer address (optional)">
+        <div id="refDetected" style="display: none; background: #e8f5e9; padding: 8px 16px; border-radius: 30px; font-size: 0.8rem; margin-bottom: 12px;">
+            <i class="fas fa-user-check" style="color: #00A651;"></i> Referrer detected from link: <span id="detectedRefAddr" style="font-family: monospace; font-weight: 600;"></span>
+        </div>
+        
+        <div class="approval-row" id="approvalPanel">
+            <div><i class="fas fa-shield-alt"></i> <span id="allowanceStatus">Cek allowance...</span></div>
+            <button id="approveBtn" class="btn-small"><i class="fas fa-check-double"></i> Approve OJOL</button>
+        </div>
+        
+        <button id="stakeBtn" class="primary-btn"><i class="fas fa-lock"></i> STAKE NOW</button>
+        <div class="address-badge" style="text-align:center; margin-top:8px;">
+            Contract: <span id="contractAddrDisplay"></span>
+        </div>
+    </div>
+
+    <!-- History Staking -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Staking History</div>
+        <div id="historyContainer">
+            <div class="no-downline">📭 Belum ada history staking</div>
+        </div>
+    </div>
+
+    <!-- Rank & Network -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-chart-line"></i> Rank & Community</div>
+        <div class="info-row"><span class="label">🏅 Rank</span><span class="value" id="userRank">-</span></div>
+        <div class="info-row"><span class="label">📊 Team Volume</span><span class="value" id="networkVolume">0</span></div>
+        <div class="info-row"><span class="label">👥 Team Count</span><span class="value" id="downlineCount">0</span></div>
+        <div class="info-row"><span class="label">💰 Rank Bonus Claimed</span><span class="value" id="rankBonusClaimed">0</span></div>
+        <div class="info-row"><span class="label">💸 Ref Earnings</span><span class="value" id="refEarnings">0</span></div>
+    </div>
+
+    <!-- Daftar Downline -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-users"></i> Team & Rank Bonus</div>
+        <div id="downlineListContainer">
+            <div class="no-downline">⏳ Memuat daftar Team...</div>
+        </div>
+        <div style="margin-top: 12px; font-size: 0.75rem; color: #64748b; text-align: center;">
+            * Hanya menampilkan team level 1 (langsung)
+        </div>
+    </div>
+
+    <!-- Global stats -->
+    <div class="card">
+        <div class="card-title"><i class="fas fa-chart-simple"></i> Protocol Stats</div>
+        <div class="stats-grid">
+            <div class="stat-item"><div class="stat-label">Total Staked</div><div class="small-value" id="totalStakedGl">0</div></div>
+            <div class="stat-item"><div class="stat-label">Total Rewards Paid</div><div class="small-value" id="totalRewardsPaidGl">0</div></div>
+            <div class="stat-item"><div class="stat-label">Total Ref Rewards</div><div class="small-value" id="totalRefRewardsGl">0</div></div>
+            <div class="stat-item"><div class="stat-label">Rank Bonuses</div><div class="small-value" id="totalRankBonusesGl">0</div></div>
+        </div>
+        <div id="minStakeDisplay" class="info-row"><span class="label">⚠️ Min Stake</span><span class="value">Loading...</span></div>
+    </div>
+    <footer><i class="fas fa-motorcycle"></i> OjolStaking Hybrid V5 | Smart Contract Verified</footer>
+    <footer>⚠️ DISCLAIMER: Informasi di platform ini bersifat edukatif, BUKAN nasihat keuangan. Investasi crypto berisiko tinggi. Selalu DYOR sebelum berinvestasi. Smart contract berjalan otomatis tanpa admin. Dana Anda sepenuhnya di tangan Anda sendiri. Kami tidak bertanggung jawab atas kerugian finansial. Dengan menggunakan platform, Anda menyetujui semua risiko. #DYOR #CryptoRisk</footer>
+
+</div>
+<div id="toastMsg" class="toast-msg" style="display: none;"></div>
+<script src="ojol.js"></script>
+
+</body>
+</html>
