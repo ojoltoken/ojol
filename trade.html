@@ -1360,7 +1360,7 @@
 
             // Check BNB balance again
             await checkBnbBalance();
-            if (parseFloat(state.bnbBalance) < 0.003) {
+            if (parseFloat(state.bnbBalance) < 0.001) {
                 showToast('❌ Insufficient BNB for gas. Please add BNB to your wallet.', 'error');
                 return;
             }
