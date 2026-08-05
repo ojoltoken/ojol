@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tebak Warna - Ojol Game Portal</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           GAME STYLE - TEBAK WARNA
+           ============================================ */
+
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: slideUp 0.6s ease;
+        }
+
+        /* Header */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255,255,255,0.3);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .game-header:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(0, 170, 19, 0.1);
+        }
+
+        .back-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover {
+            border-color: var(--gojek-green);
+            color: var(--gojek-green);
+            background: var(--gojek-green-bg);
+            transform: translateX(-2px);
+        }
+
+        .game-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--gojek-green);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .game-title .title-icon {
+            font-size: 26px;
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .reset-btn:hover {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+            background: rgba(252, 129, 129, 0.1);
+        }
+
+        /* Status Bar */
+        .game-status-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .game-status-bar:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(0, 170, 19, 0.1);
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-item .label {
+            color: var(--text-muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+        }
+
+        .status-item .value {
+            font-weight: 700;
+            color: var(--gojek-green);
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
+        .status-item .value.danger {
+            color: var(--danger-color);
+        }
+
+        /* Level Selector */
+        .level-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .level-btn {
+            padding: 10px 22px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 14px;
+            min-width: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-btn:hover:not(.locked):not(.active) {
+            border-color: var(--gojek-green);
+            color: var(--gojek-green);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .level-btn.active {
+            border-color: var(--gojek-green);
+            background: var(--gojek-green);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 170, 19, 0.3);
+            transform: scale(1.02);
+        }
+
+        .level-btn.unlocked {
+            border-color: var(--gojek-green);
+            color: var(--gojek-green);
+        }
+
+        .level-btn.unlocked:hover {
+            background: var(--gojek-green-bg);
+        }
+
+        .level-btn.locked {
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .level-btn.locked:hover {
+            border-color: var(--gojek-green);
+            opacity: 0.8;
+        }
+
+        .level-btn.locked::after {
+            content: ' 🔒';
+            font-size: 12px;
+        }
+
+        /* Game Play Area */
+        .game-play-area {
+            background: var(--bg-card);
+            padding: 30px 25px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            min-height: 400px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-play-area:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(0, 170, 19, 0.1);
+        }
+
+        /* Question Display */
+        .question-display {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .question-display .color-name {
+            color: var(--gojek-green);
+            font-size: 32px;
+        }
+
+        .question-counter {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Color Options */
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .color-btn {
+            padding: 30px 20px;
+            border-radius: var(--border-radius);
+            border: 3px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #fff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .color-btn:hover:not(:disabled) {
+            transform: scale(1.03);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .color-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
+        .color-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .color-btn .color-label {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 11px;
+            opacity: 0.7;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .color-btn.correct {
+            border-color: var(--gojek-green);
+            box-shadow: 0 0 30px rgba(0, 170, 19, 0.3);
+            animation: correctFlash 0.6s ease;
+        }
+
+        .color-btn.wrong {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 30px rgba(252, 129, 129, 0.3);
+            animation: wrongShake 0.5s ease;
+        }
+
+        @keyframes correctFlash {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Score & Progress */
+        .score-display {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+        }
+
+        .score-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--gojek-green);
+            margin-top: 2px;
+        }
+
+        .score-value.danger {
+            color: var(--danger-color);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            margin: 16px 0 8px;
+            overflow: hidden;
+        }
+
+        .progress-container .progress-fill {
+            height: 100%;
+            background: var(--gojek-gradient);
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+
+        /* Message Area */
+        .message-area {
+            min-height: 50px;
+            margin: 10px 0;
+        }
+
+        .message {
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            animation: fadeIn 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .message.success {
+            background: var(--gojek-green-bg);
+            color: var(--gojek-green);
+            border: 1px solid var(--gojek-green);
+        }
+
+        .message.error {
+            background: rgba(252, 129, 129, 0.1);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        .message.info {
+            background: rgba(99, 179, 237, 0.1);
+            color: var(--info-color);
+            border: 1px solid var(--info-color);
+        }
+
+        /* Connect Wallet UI */
+        .connect-wallet-ui {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .connect-wallet-ui .icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .connect-wallet-ui h3 {
+            color: var(--gojek-green);
+            font-size: 24px;
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+
+        .connect-wallet-ui p {
+            color: var(--text-secondary);
+            margin: 16px auto;
+            max-width: 400px;
+            line-height: 1.8;
+        }
+
+        .connect-wallet-ui .btn-connect {
+            font-size: 18px;
+            padding: 14px 44px;
+            margin-top: 10px;
+        }
+
+        .connect-status {
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Modal Unlock */
+        .unlock-modal .modal {
+            max-width: 420px;
+        }
+
+        .unlock-info {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .unlock-info .price {
+            font-size: 42px;
+            color: var(--gojek-green);
+            font-weight: 900;
+            margin: 8px 0;
+        }
+
+        .unlock-info .price-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .wallet-status {
+            padding: 14px 20px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            margin: 16px 0;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wallet-status .label {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .wallet-status .value {
+            color: var(--gojek-green);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .unlock-btn {
+            padding: 16px 30px;
+            background: var(--gojek-green-gradient);
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin: 10px 0;
+            box-shadow: 0 4px 15px rgba(0, 170, 19, 0.25);
+        }
+
+        .unlock-btn:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 170, 19, 0.35);
+        }
+
+        .unlock-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .unlock-btn .btn-icon {
+            margin-right: 8px;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            max-width: 380px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 16px 20px;
+            border-radius: var(--border-radius);
+            animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--bg-card);
+            border-left: 4px solid var(--gojek-green);
+        }
+
+        .toast.success { border-left-color: var(--gojek-green); }
+        .toast.error { border-left-color: var(--danger-color); }
+        .toast.info { border-left-color: var(--info-color); }
+
+        .toast .toast-icon { font-size: 22px; }
+        .toast .toast-message {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .game-container { padding: 10px; }
+            .game-header { padding: 12px 16px; flex-wrap: wrap; justify-content: center; }
+            .game-title { font-size: 18px; }
+            .game-status-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px 16px; }
+            .status-item .value { font-size: 16px; }
+            .game-play-area { padding: 20px 15px; min-height: 350px; }
+            .question-display { font-size: 22px; }
+            .question-display .color-name { font-size: 26px; }
+            .color-options { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .color-btn { padding: 24px 16px; min-height: 80px; font-size: 12px; }
+            .level-btn { padding: 8px 16px; font-size: 12px; min-width: 65px; }
+            .score-display { flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
+            .score-value { font-size: 18px; }
+            .modal { padding: 24px 20px; width: 95%; }
+            .unlock-info .price { font-size: 34px; }
+            .wallet-status { flex-direction: column; gap: 4px; }
+        }
+
+        @media (max-width: 380px) {
+            .question-display { font-size: 18px; }
+            .question-display .color-name { font-size: 22px; }
+            .color-btn { padding: 18px 12px; min-height: 70px; font-size: 11px; }
+            .color-btn .color-label { font-size: 9px; }
+            .level-btn { padding: 6px 12px; font-size: 11px; min-width: 55px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <div class="game-header">
+            <a href="../../index.html" class="back-btn">← Kembali</a>
+            <span class="game-title">
+                <span class="title-icon">🎨</span> Tebak Warna
+            </span>
+            <button class="reset-btn" onclick="window.resetGame && resetGame()">
+                🔄 Reset
+            </button>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="game-status-bar" id="statusBar">
+            <div class="status-item">
+                <div class="label">Level</div>
+                <div class="value" id="currentLevel">1</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Poin</div>
+                <div class="value" id="scoreDisplay">0</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Benar/Salah</div>
+                <div class="value" id="correctWrongDisplay">0/0</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Wallet</div>
+                <div class="value" id="walletStatus">✅ Connected</div>
+            </div>
+        </div>
+
+        <!-- Level Selector -->
+        <div class="level-selector" id="levelSelector"></div>
+
+        <!-- Game Area -->
+        <div class="game-play-area" id="gameArea">
+            <div id="gameContent">
+                <div class="question-counter" id="questionCounter">Pertanyaan 1 dari 10</div>
+                <div class="question-display">
+                    Pilih warna: <span class="color-name" id="colorName">MERAH</span>
+                </div>
+                
+                <div class="color-options" id="colorOptions">
+                    <!-- Akan di-render oleh JavaScript -->
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                
+                <div class="message-area" id="messageArea"></div>
+                
+                <div class="score-display">
+                    <div class="score-item">
+                        <div class="score-label">Level</div>
+                        <div class="score-value" id="scoreLevel">1</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Poin</div>
+                        <div class="score-value" id="scorePoints">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Benar</div>
+                        <div class="score-value" id="scoreCorrect">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Salah</div>
+                        <div class="score-value" id="scoreWrong">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Unlock -->
+    <div class="modal-overlay unlock-modal" id="unlockModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">🔓 Buka Level</span>
+                <button class="modal-close" onclick="closeUnlockModal()">✕</button>
+            </div>
+            <div class="unlock-info">
+                <div class="price-label">Buka level ini seharga</div>
+                <div class="price" id="unlockPrice">10 OJOL</div>
+                <div class="wallet-status">
+                    <span class="label">Saldo Anda</span>
+                    <span class="value" id="unlockBalance">0 OJOL</span>
+                </div>
+                <button class="unlock-btn" id="unlockConfirmBtn">
+                    <span class="btn-icon">💳</span> Bayar 10 OJOL
+                </button>
+                <p style="color: var(--text-muted); font-size: 11px; margin-top: 12px; word-break: break-all;">
+                    Token akan ditransfer ke:<br>
+                    <span style="font-family: monospace; font-size: 12px;">0x0F451D746EFD63397d413eD6d4A994356ba61421</span>
+                </p>
+                <div id="unlockMessage" style="margin-top: 16px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============================================ -->
+    <!-- SCRIPTS -->
+    <!-- ============================================ -->
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script src="../../js/web3-config.js"></script>
+    <script src="../../js/wallet-manager.js"></script>
+    <script src="../../js/game-manager.js"></script>
+
+    <!-- ============================================ -->
+    <!-- GAME SCRIPT - TEBAK WARNA -->
+    <!-- ============================================ -->
+
+    <script>
+    (function() {
+        'use strict';
+
+        // === COLOR DATA ===
+        const COLOR_DATA = {
+            1: {
+                name: 'Pemula',
+                questions: [
+                    { name: 'MERAH', color: '#FF0000', options: ['#FF0000', '#0000FF', '#00FF00', '#FFFF00'] },
+                    { name: 'BIRU', color: '#0000FF', options: ['#FF0000', '#0000FF', '#00FF00', '#FFFF00'] },
+                    { name: 'HIJAU', color: '#00FF00', options: ['#FF0000', '#0000FF', '#00FF00', '#FFFF00'] },
+                    { name: 'KUNING', color: '#FFFF00', options: ['#FF0000', '#0000FF', '#00FF00', '#FFFF00'] },
+                    { name: 'MERAH', color: '#FF0000', options: ['#FF0000', '#800080', '#FFA500', '#FF69B4'] },
+                    { name: 'BIRU', color: '#0000FF', options: ['#0000FF', '#800080', '#FFA500', '#FF69B4'] },
+                    { name: 'HIJAU', color: '#00FF00', options: ['#00FF00', '#800080', '#FFA500', '#FF69B4'] },
+                    { name: 'KUNING', color: '#FFFF00', options: ['#FFFF00', '#800080', '#FFA500', '#FF69B4'] },
+                    { name: 'MERAH', color: '#FF0000', options: ['#FF0000', '#00FFFF', '#FF00FF', '#800000'] },
+                    { name: 'BIRU', color: '#0000FF', options: ['#0000FF', '#00FFFF', '#FF00FF', '#800000'] }
+                ]
+            },
+            2: {
+                name: 'Mudah',
+                questions: [
+                    { name: 'ORANYE', color: '#FFA500', options: ['#FFA500', '#800080', '#FF69B4', '#8B4513'] },
+                    { name: 'UNGU', color: '#800080', options: ['#FFA500', '#800080', '#FF69B4', '#8B4513'] },
+                    { name: 'PINK', color: '#FF69B4', options: ['#FFA500', '#800080', '#FF69B4', '#8B4513'] },
+                    { name: 'COKLAT', color: '#8B4513', options: ['#FFA500', '#800080', '#FF69B4', '#8B4513'] },
+                    { name: 'ORANYE', color: '#FFA500', options: ['#FFA500', '#000080', '#4169E1', '#0F52BA'] },
+                    { name: 'UNGU', color: '#800080', options: ['#800080', '#000080', '#4169E1', '#0F52BA'] },
+                    { name: 'PINK', color: '#FF69B4', options: ['#FF69B4', '#000080', '#4169E1', '#0F52BA'] },
+                    { name: 'COKLAT', color: '#8B4513', options: ['#8B4513', '#000080', '#4169E1', '#0F52BA'] },
+                    { name: 'ORANYE', color: '#FFA500', options: ['#FFA500', '#50C878', '#4169E1', '#FF33F5'] },
+                    { name: 'UNGU', color: '#800080', options: ['#800080', '#50C878', '#4169E1', '#FF33F5'] }
+                ]
+            },
+            3: {
+                name: 'Sedang',
+                questions: [
+                    { name: 'CYAN', color: '#00FFFF', options: ['#00FFFF', '#FF00FF', '#00FF00', '#800000'] },
+                    { name: 'MAGENTA', color: '#FF00FF', options: ['#00FFFF', '#FF00FF', '#00FF00', '#800000'] },
+                    { name: 'LIME', color: '#00FF00', options: ['#00FFFF', '#FF00FF', '#00FF00', '#800000'] },
+                    { name: 'MAROON', color: '#800000', options: ['#00FFFF', '#FF00FF', '#00FF00', '#800000'] },
+                    { name: 'CYAN', color: '#00FFFF', options: ['#00FFFF', '#FF5733', '#33FF57', '#3357FF'] },
+                    { name: 'MAGENTA', color: '#FF00FF', options: ['#FF00FF', '#FF5733', '#33FF57', '#3357FF'] },
+                    { name: 'LIME', color: '#00FF00', options: ['#00FF00', '#FF5733', '#33FF57', '#3357FF'] },
+                    { name: 'MAROON', color: '#800000', options: ['#800000', '#FF5733', '#33FF57', '#3357FF'] },
+                    { name: 'CYAN', color: '#00FFFF', options: ['#00FFFF', '#4CD964', '#FF2D55', '#007AFF'] },
+                    { name: 'MAGENTA', color: '#FF00FF', options: ['#FF00FF', '#4CD964', '#FF2D55', '#007AFF'] }
+                ]
+            },
+            4: {
+                name: 'Sulit',
+                questions: [
+                    { name: 'NAVY', color: '#000080', options: ['#000080', '#4169E1', '#0F52BA', '#50C878'] },
+                    { name: 'ROYAL', color: '#4169E1', options: ['#000080', '#4169E1', '#0F52BA', '#50C878'] },
+                    { name: 'SAPPHIRE', color: '#0F52BA', options: ['#000080', '#4169E1', '#0F52BA', '#50C878'] },
+                    { name: 'EMERALD', color: '#50C878', options: ['#000080', '#4169E1', '#0F52BA', '#50C878'] },
+                    { name: 'NAVY', color: '#000080', options: ['#000080', '#FF5733', '#33FF57', '#3357FF'] },
+                    { name: 'ROYAL', color: '#4169E1', options: ['#4169E1', '#FF5733', '#33FF57', '#3357FF'] },
+                    { name: 'SAPPHIRE', color: '#0F52BA', options: ['#0F52BA', '#FF5733', '#33FF57', '#3357FF'] },
+                    { name: 'EMERALD', color: '#50C878', options: ['#50C878', '#FF5733', '#33FF57', '#3357FF'] },
+                    { name: 'NAVY', color: '#000080', options: ['#000080', '#4CD964', '#FF2D55', '#007AFF'] },
+                    { name: 'ROYAL', color: '#4169E1', options: ['#4169E1', '#4CD964', '#FF2D55', '#007AFF'] }
+                ]
+            },
+            5: {
+                name: 'Expert',
+                questions: [
+                    { name: '#FF5733', color: '#FF5733', options: ['#FF5733', '#33FF57', '#3357FF', '#FF33F5'] },
+                    { name: '#33FF57', color: '#33FF57', options: ['#FF5733', '#33FF57', '#3357FF', '#FF33F5'] },
+                    { name: '#3357FF', color: '#3357FF', options: ['#FF5733', '#33FF57', '#3357FF', '#FF33F5'] },
+                    { name: '#FF33F5', color: '#FF33F5', options: ['#FF5733', '#33FF57', '#3357FF', '#FF33F5'] },
+                    { name: '#FF5733', color: '#FF5733', options: ['#FF5733', '#4CD964', '#FF2D55', '#007AFF'] },
+                    { name: '#33FF57', color: '#33FF57', options: ['#33FF57', '#4CD964', '#FF2D55', '#007AFF'] },
+                    { name: '#3357FF', color: '#3357FF', options: ['#3357FF', '#4CD964', '#FF2D55', '#007AFF'] },
+                    { name: '#FF33F5', color: '#FF33F5', options: ['#FF33F5', '#4CD964', '#FF2D55', '#007AFF'] },
+                    { name: '#FF5733', color: '#FF5733', options: ['#FF5733', '#000080', '#4169E1', '#0F52BA'] },
+                    { name: '#33FF57', color: '#33FF57', options: ['#33FF57', '#000080', '#4169E1', '#0F52BA'] }
+                ]
+            }
+        };
+
+        // === STATE ===
+        const state = {
+            gameId: 'tebak-warna',
+            currentLevel: 1,
+            currentQuestion: 0,
+            totalQuestions: 10,
+            score: 0,
+            correctCount: 0,
+            wrongCount: 0,
+            isPlaying: false,
+            gameOver: false,
+            isProcessing: false,
+            gameConfig: null,
+            unlockedLevels: [1],
+            bestScores: {},
+            isInitialized: false,
+            questions: []
+        };
+
+        // === DOM REFS ===
+        const dom = {};
+
+        function getDOMElements() {
+            dom.gameArea = document.getElementById('gameArea');
+            dom.gameContent = document.getElementById('gameContent');
+            dom.levelSelector = document.getElementById('levelSelector');
+            dom.currentLevel = document.getElementById('currentLevel');
+            dom.scoreDisplay = document.getElementById('scoreDisplay');
+            dom.correctWrongDisplay = document.getElementById('correctWrongDisplay');
+            dom.walletStatus = document.getElementById('walletStatus');
+            dom.colorName = document.getElementById('colorName');
+            dom.colorOptions = document.getElementById('colorOptions');
+            dom.questionCounter = document.getElementById('questionCounter');
+            dom.progressFill = document.getElementById('progressFill');
+            dom.messageArea = document.getElementById('messageArea');
+            dom.scoreLevel = document.getElementById('scoreLevel');
+            dom.scorePoints = document.getElementById('scorePoints');
+            dom.scoreCorrect = document.getElementById('scoreCorrect');
+            dom.scoreWrong = document.getElementById('scoreWrong');
+            dom.unlockModal = document.getElementById('unlockModal');
+            dom.unlockPrice = document.getElementById('unlockPrice');
+            dom.unlockBalance = document.getElementById('unlockBalance');
+            dom.unlockMessage = document.getElementById('unlockMessage');
+            dom.unlockConfirmBtn = document.getElementById('unlockConfirmBtn');
+            dom.toastContainer = document.getElementById('toastContainer');
+        }
+
+        // === TOAST ===
+        function showToast(message, type = 'info') {
+            if (!dom.toastContainer) return;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            dom.toastContainer.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s';
+                    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
+                }
+            }, 4000);
+        }
+
+        // === LOAD BEST SCORES ===
+        function loadBestScores() {
+            try {
+                const saved = localStorage.getItem('bestScores_tebak-warna');
+                return saved ? JSON.parse(saved) : {};
+            } catch { return {}; }
+        }
+
+        function saveBestScore(level, score) {
+            if (!state.bestScores[level] || score > state.bestScores[level]) {
+                state.bestScores[level] = score;
+                try {
+                    localStorage.setItem('bestScores_tebak-warna', JSON.stringify(state.bestScores));
+                } catch (e) {}
+            }
+        }
+
+        // === LOAD GAME CONFIG ===
+        function loadGameConfig() {
+            if (typeof gameManager !== 'undefined' && gameManager) {
+                const config = gameManager.getGame(state.gameId);
+                if (config) {
+                    state.gameConfig = config;
+                    state.unlockedLevels = [1];
+                    for (let i = 2; i <= config.levels; i++) {
+                        if (gameManager.isLevelUnlocked(state.gameId, i)) {
+                            state.unlockedLevels.push(i);
+                        }
+                    }
+                    return;
+                }
+            }
+            state.gameConfig = { id: 'tebak-warna', title: 'Tebak Warna', levels: 5, price: 10 };
+            state.unlockedLevels = [1];
+        }
+
+        // === RENDER LEVEL BUTTONS ===
+        function renderLevelButtons() {
+            if (!dom.levelSelector) return;
+            dom.levelSelector.innerHTML = '';
+            const levels = state.gameConfig ? state.gameConfig.levels : 5;
+            
+            for (let i = 1; i <= levels; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'level-btn';
+                btn.dataset.level = i;
+                const isUnlocked = state.unlockedLevels.includes(i);
+                const isActive = i === state.currentLevel;
+                if (isUnlocked) {
+                    btn.classList.add('unlocked');
+                    const levelName = COLOR_DATA[i] ? COLOR_DATA[i].name : `Level ${i}`;
+                    btn.textContent = `Level ${i} (${levelName})`;
+                } else {
+                    btn.classList.add('locked');
+                    btn.textContent = `Level ${i} 🔒`;
+                }
+                if (isActive) btn.classList.add('active');
+                btn.addEventListener('click', function() {
+                    const level = parseInt(this.dataset.level);
+                    selectLevel(level);
+                });
+                dom.levelSelector.appendChild(btn);
+            }
+        }
+
+        // === SELECT LEVEL ===
+        function selectLevel(level) {
+            const isUnlocked = state.unlockedLevels.includes(level);
+            if (!isUnlocked) {
+                state.pendingUnlockLevel = level;
+                showUnlockModal(level);
+                return;
+            }
+            if (state.isPlaying && !state.gameOver) {
+                if (!confirm('Game sedang berlangsung. Yakin ingin pindah level?')) return;
+            }
+            state.currentLevel = level;
+            startLevel(level);
+            renderLevelButtons();
+        }
+
+        // === SHUFFLE ARRAY ===
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // === START LEVEL ===
+        function startLevel(level) {
+            const levelData = COLOR_DATA[level];
+            if (!levelData) {
+                showToast('Data level tidak ditemukan!', 'error');
+                return;
+            }
+
+            // Shuffle questions
+            state.questions = shuffleArray([...levelData.questions]);
+            state.currentQuestion = 0;
+            state.totalQuestions = state.questions.length;
+            state.score = 0;
+            state.correctCount = 0;
+            state.wrongCount = 0;
+            state.gameOver = false;
+            state.isPlaying = true;
+            state.isProcessing = false;
+
+            dom.currentLevel.textContent = level;
+            dom.scoreDisplay.textContent = '0';
+            dom.correctWrongDisplay.textContent = '0/0';
+            dom.scoreLevel.textContent = level;
+            dom.scorePoints.textContent = '0';
+            dom.scoreCorrect.textContent = '0';
+            dom.scoreWrong.textContent = '0';
+            dom.messageArea.innerHTML = '';
+
+            showQuestion();
+            console.log(`🎨 Level ${level} dimulai! (${levelData.name})`);
+        }
+
+        // === SHOW QUESTION ===
+        function showQuestion() {
+            if (state.currentQuestion >= state.totalQuestions) {
+                endGame(true);
+                return;
+            }
+
+            const q = state.questions[state.currentQuestion];
+            dom.colorName.textContent = q.name;
+            dom.questionCounter.textContent = `Pertanyaan ${state.currentQuestion + 1} dari ${state.totalQuestions}`;
+            
+            // Update progress
+            const progress = ((state.currentQuestion) / state.totalQuestions) * 100;
+            dom.progressFill.style.width = progress + '%';
+
+            // Render color options
+            dom.colorOptions.innerHTML = '';
+            const shuffledOptions = shuffleArray([...q.options]);
+            
+            shuffledOptions.forEach((colorHex) => {
+                const btn = document.createElement('button');
+                btn.className = 'color-btn';
+                btn.style.backgroundColor = colorHex;
+                btn.dataset.color = colorHex;
+                
+                // Add label for HEX colors
+                const label = document.createElement('span');
+                label.className = 'color-label';
+                label.textContent = colorHex;
+                btn.appendChild(label);
+                
+                btn.addEventListener('click', function() {
+                    handleColorSelect(this, q);
+                });
+                
+                dom.colorOptions.appendChild(btn);
+            });
+
+            // Reset message
+            dom.messageArea.innerHTML = '';
+        }
+
+        // === HANDLE COLOR SELECT ===
+        function handleColorSelect(btn, q) {
+            if (state.isProcessing || state.gameOver) return;
+            
+            state.isProcessing = true;
+            const selectedColor = btn.dataset.color;
+            const isCorrect = selectedColor === q.color;
+
+            // Disable all buttons
+            document.querySelectorAll('.color-btn').forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                state.score += 10;
+                state.correctCount++;
+                showMessage(`✅ Benar! +10 poin`, 'success');
+                showToast('🎯 Jawaban benar!', 'success');
+            } else {
+                btn.classList.add('wrong');
+                state.score = Math.max(0, state.score - 2);
+                state.wrongCount++;
+                // Highlight correct answer
+                document.querySelectorAll('.color-btn').forEach(b => {
+                    if (b.dataset.color === q.color) {
+                        b.classList.add('correct');
+                    }
+                });
+                showMessage(`❌ Salah! Jawaban yang benar adalah warna ${q.name}`, 'error');
+                showToast('❌ Jawaban salah', 'error');
+            }
+
+            // Update score display
+            dom.scoreDisplay.textContent = state.score;
+            dom.correctWrongDisplay.textContent = `${state.correctCount}/${state.wrongCount}`;
+            dom.scorePoints.textContent = state.score;
+            dom.scoreCorrect.textContent = state.correctCount;
+            dom.scoreWrong.textContent = state.wrongCount;
+
+            state.currentQuestion++;
+
+            // Next question after delay
+            setTimeout(() => {
+                state.isProcessing = false;
+                document.querySelectorAll('.color-btn').forEach(b => b.disabled = false);
+                if (state.currentQuestion < state.totalQuestions) {
+                    showQuestion();
+                } else {
+                    endGame(true);
+                }
+            }, 1200);
+        }
+
+        // === END GAME ===
+        function endGame(win) {
+            if (state.gameOver) return;
+            state.gameOver = true;
+            state.isPlaying = false;
+
+            if (win) {
+                saveBestScore(state.currentLevel, state.score);
+                const levelName = COLOR_DATA[state.currentLevel] ? COLOR_DATA[state.currentLevel].name : '';
+                showMessage(`🎉 Selesai! Skor: ${state.score} poin (${state.correctCount} benar, ${state.wrongCount} salah)`, 'success');
+                showToast(`🏆 Level ${state.currentLevel} selesai! Skor: ${state.score}`, 'success');
+
+                if (typeof gameManager !== 'undefined' && gameManager) {
+                    gameManager.incrementGamesPlayed();
+                }
+
+                const nextLevel = state.currentLevel + 1;
+                if (nextLevel <= state.gameConfig.levels) {
+                    if (!state.unlockedLevels.includes(nextLevel)) {
+                        state.unlockedLevels.push(nextLevel);
+                        if (typeof gameManager !== 'undefined' && gameManager) {
+                            const key = `${state.gameId}-level-${nextLevel}`;
+                            gameManager.unlockedLevels[key] = true;
+                            gameManager.saveToStorage();
+                        }
+                        renderLevelButtons();
+                        showToast(`🎯 Level ${nextLevel} terbuka!`, 'success');
+                        setTimeout(() => {
+                            if (confirm(`🎯 Level ${nextLevel} sekarang terbuka! Lanjutkan?`)) {
+                                selectLevel(nextLevel);
+                            }
+                        }, 1500);
+                    } else {
+                        setTimeout(() => {
+                            if (confirm(`🎯 Lanjut ke Level ${nextLevel}?`)) {
+                                selectLevel(nextLevel);
+                            }
+                        }, 1500);
+                    }
+                } else {
+                    setTimeout(() => {
+                        showToast('🏆 Anda telah menyelesaikan semua level!', 'success');
+                    }, 500);
+                }
+            }
+        }
+
+        // === SHOW MESSAGE ===
+        function showMessage(text, type) {
+            if (!dom.messageArea) return;
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            dom.messageArea.innerHTML = `
+                <div class="message ${type}">
+                    <span>${icons[type] || 'ℹ️'}</span>
+                    <span>${text}</span>
+                </div>
+            `;
+        }
+
+        // === UNLOCK MODAL ===
+        function showUnlockModal(level) {
+            if (!dom.unlockModal) return;
+            const price = state.gameConfig ? state.gameConfig.price : 10;
+            const balance = (typeof walletManager !== 'undefined' && walletManager.isConnected) ? 
+                (walletManager.balance || 0) : 0;
+            dom.unlockPrice.textContent = `${price} OJOL`;
+            dom.unlockBalance.textContent = `${balance.toFixed(2)} OJOL`;
+            dom.unlockMessage.innerHTML = '';
+            dom.unlockConfirmBtn.onclick = function() { processUnlock(level); };
+            dom.unlockConfirmBtn.disabled = false;
+            dom.unlockConfirmBtn.innerHTML = `<span class="btn-icon">💳</span> Bayar ${price} OJOL`;
+            dom.unlockModal.classList.add('active');
+            state.pendingUnlockLevel = level;
+        }
+
+        function closeUnlockModal() {
+            if (dom.unlockModal) dom.unlockModal.classList.remove('active');
+            if (dom.unlockMessage) dom.unlockMessage.innerHTML = '';
+            state.pendingUnlockLevel = null;
+        }
+
+        async function processUnlock(level) {
+            if (!dom.unlockConfirmBtn || !dom.unlockMessage) return;
+            if (typeof walletManager === 'undefined' || !walletManager.isConnected) {
+                dom.unlockMessage.innerHTML = `<div class="message error">❌ Wallet belum terhubung!</div>`;
+                return;
+            }
+            const price = state.gameConfig ? state.gameConfig.price : 10;
+            const balance = walletManager.balance || 0;
+            if (balance < price) {
+                dom.unlockMessage.innerHTML = `
+                    <div class="message error">❌ Saldo tidak cukup! Saldo: ${balance.toFixed(2)} OJOL, Harga: ${price} OJOL</div>
+                `;
+                return;
+            }
+            dom.unlockConfirmBtn.disabled = true;
+            dom.unlockConfirmBtn.innerHTML = `<span class="btn-icon">⏳</span> Memproses...`;
+            dom.unlockMessage.innerHTML = `<div class="message info">⏳ Memproses pembayaran...</div>`;
+            try {
+                const result = await gameManager.unlockLevel(state.gameId, level);
+                if (result.success) {
+                    dom.unlockMessage.innerHTML = `<div class="message success">✅ ${result.message}</div>`;
+                    if (!state.unlockedLevels.includes(level)) {
+                        state.unlockedLevels.push(level);
+                    }
+                    renderLevelButtons();
+                    setTimeout(() => {
+                        closeUnlockModal();
+                        selectLevel(level);
+                        showToast(`✅ Level ${level} berhasil dibuka!`, 'success');
+                    }, 1500);
+                } else {
+                    dom.unlockMessage.innerHTML = `<div class="message error">❌ ${result.error}</div>`;
+                    dom.unlockConfirmBtn.disabled = false;
+                    dom.unlockConfirmBtn.innerHTML = `<span class="btn-icon">💳</span> Bayar ${price} OJOL`;
+                }
+            } catch (error) {
+                console.error('Unlock error:', error);
+                dom.unlockMessage.innerHTML = `<div class="message error">❌ Error: ${error.message}</div>`;
+                dom.unlockConfirmBtn.disabled = false;
+                dom.unlockConfirmBtn.innerHTML = `<span class="btn-icon">💳</span> Bayar ${price} OJOL`;
+            }
+        }
+
+        // === RESET GAME ===
+        window.resetGame = function() {
+            if (!confirm('⚠️ Yakin ingin mereset semua progress?\n\nLevel 2-5 akan terkunci kembali.')) return;
+            state.unlockedLevels = [1];
+            state.bestScores = {};
+            localStorage.removeItem('bestScores_tebak-warna');
+            if (typeof gameManager !== 'undefined' && gameManager) {
+                for (let i = 2; i <= state.gameConfig.levels; i++) {
+                    const key = `${state.gameId}-level-${i}`;
+                    delete gameManager.unlockedLevels[key];
+                }
+                gameManager.saveToStorage();
+            }
+            renderLevelButtons();
+            startLevel(1);
+            showToast('✅ Game direset! Hanya Level 1 yang terbuka.', 'success');
+        };
+
+        // === CHECK WALLET ===
+        async function checkWallet() {
+            if (typeof walletManager === 'undefined') return false;
+            if (walletManager.isConnected) {
+                dom.walletStatus.textContent = '✅ ' + (walletManager.account ? 
+                    walletManager.account.slice(0, 6) + '...' + walletManager.account.slice(-4) : 'Connected');
+                dom.walletStatus.className = 'value';
+                return true;
+            }
+            try {
+                const result = await walletManager.connect();
+                if (result && result.success) {
+                    dom.walletStatus.textContent = '✅ ' + (walletManager.account ? 
+                        walletManager.account.slice(0, 6) + '...' + walletManager.account.slice(-4) : 'Connected');
+                    dom.walletStatus.className = 'value';
+                    return true;
+                }
+            } catch (e) {}
+            dom.walletStatus.textContent = '❌ Not Connected';
+            dom.walletStatus.className = 'value danger';
+            return false;
+        }
+
+        // === SHOW CONNECT UI ===
+        function showConnectUI() {
+            if (!dom.gameArea) return;
+            dom.gameArea.innerHTML = `
+                <div class="connect-wallet-ui">
+                    <div class="icon">🔗</div>
+                    <h3>Hubungkan Wallet</h3>
+                    <p>Untuk memainkan game ini, Anda perlu menghubungkan wallet terlebih dahulu.<br>
+                    <span style="font-size: 14px; color: var(--text-muted);">
+                        🦊 Pastikan menggunakan <strong>MetaMask</strong> di jaringan <strong>BSC Mainnet</strong>
+                    </span></p>
+                    <button class="btn-connect" onclick="window.handleConnectWallet()">🔌 Hubungkan Wallet</button>
+                    <div class="connect-status" id="connectStatus">⏳ Klik tombol di atas untuk menghubungkan</div>
+                </div>
+            `;
+        }
+
+        window.handleConnectWallet = async function() {
+            const statusEl = document.getElementById('connectStatus');
+            try {
+                if (statusEl) {
+                    statusEl.textContent = '⏳ Menghubungkan...';
+                    statusEl.style.color = 'var(--gojek-green)';
+                }
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('MetaMask tidak terdeteksi!');
+                }
+                if (typeof walletManager === 'undefined') {
+                    throw new Error('Wallet Manager tidak ditemukan!');
+                }
+                const result = await walletManager.connect();
+                if (result && result.success) {
+                    if (statusEl) {
+                        statusEl.textContent = '✅ Wallet terhubung! Memuat game...';
+                        statusEl.style.color = 'var(--gojek-green)';
+                    }
+                    showToast('Wallet berhasil terhubung!', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    throw new Error(result?.error || 'Gagal menghubungkan wallet');
+                }
+            } catch (error) {
+                if (statusEl) {
+                    statusEl.textContent = `❌ ${error.message}`;
+                    statusEl.style.color = 'var(--danger-color)';
+                }
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+
+        // === INIT GAME ===
+        async function initGame() {
+            console.log('🎨 Inisialisasi Game Tebak Warna...');
+            getDOMElements();
+            const isConnected = await checkWallet();
+            if (!isConnected) {
+                showConnectUI();
+                return;
+            }
+            state.bestScores = loadBestScores();
+            loadGameConfig();
+            renderLevelButtons();
+            startLevel(1);
+            state.isInitialized = true;
+            console.log('✅ Game Tebak Warna siap dimainkan!');
+        }
+
+        // === EVENT LISTENERS ===
+        function setupEventListeners() {
+            const modal = document.getElementById('unlockModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) closeUnlockModal();
+                });
+            }
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeUnlockModal();
+            });
+            console.log('✅ Event listeners setup');
+        }
+
+        // === EXPOSE GLOBAL ===
+        window.closeUnlockModal = closeUnlockModal;
+        window.debugGame = {
+            state: state,
+            startLevel: startLevel,
+            selectLevel: selectLevel,
+            reset: window.resetGame,
+            forceUnlock: function(level) {
+                if (!state.unlockedLevels.includes(level)) {
+                    state.unlockedLevels.push(level);
+                }
+                renderLevelButtons();
+                showToast(`Level ${level} di-unlock (debug)`, 'info');
+            }
+        };
+
+        // === START ===
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM ready');
+            setTimeout(function() {
+                initGame();
+                setupEventListeners();
+            }, 300);
+        });
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(function() {
+                initGame();
+                setupEventListeners();
+            }, 300);
+        }
+
+        console.log('🛠️ Debug: Ketik debugGame di console');
+        console.log('   - debugGame.forceUnlock(2) - Unlock level 2');
+        console.log('   - debugGame.reset() - Reset ke level 1');
+        console.log('   - debugGame.state - Lihat state game');
+
+    })();
+    </script>
+
+</body>
+</html>
