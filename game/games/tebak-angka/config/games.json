@@ -1,0 +1,15 @@
+{
+  "games": [
+    {
+      "id": "tebak-angka",
+      "title": "Tebak Angka Premium",
+      "description": "Tebak angka yang benar dengan batas waktu!",
+      "thumbnail": "https://alyne.id/hybrid/game/assets/images/tebak-angka.jpg",
+      "price": 10,
+      "levels": 5,
+      "level1Free": true,
+      "contractAddress": "0x0cCB00abb35109FF33F0AbaB1C07915900954695",
+      "paymentAddress": "0x0F451D746EFD63397d413eD6d4A994356ba61421"
+    }
+  ]
+}

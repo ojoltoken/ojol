@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tebak Kata - Ojol Game Portal</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           GAME STYLE - TEBAK KATA
+           ============================================ */
+
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: slideUp 0.6s ease;
+        }
+
+        /* Header */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255,255,255,0.3);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .game-header:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(0, 170, 19, 0.1);
+        }
+
+        .back-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover {
+            border-color: var(--gojek-green);
+            color: var(--gojek-green);
+            background: var(--gojek-green-bg);
+            transform: translateX(-2px);
+        }
+
+        .game-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--gojek-green);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .game-title .title-icon {
+            font-size: 26px;
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .reset-btn:hover {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+            background: rgba(252, 129, 129, 0.1);
+        }
+
+        /* Status Bar */
+        .game-status-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .game-status-bar:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(0, 170, 19, 0.1);
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-item .label {
+            color: var(--text-muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+        }
+
+        .status-item .value {
+            font-weight: 700;
+            color: var(--gojek-green);
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
+        .status-item .value.danger {
+            color: var(--danger-color);
+        }
+
+        /* Level Selector */
+        .level-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .level-btn {
+            padding: 10px 22px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 14px;
+            min-width: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-btn:hover:not(.locked):not(.active) {
+            border-color: var(--gojek-green);
+            color: var(--gojek-green);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .level-btn.active {
+            border-color: var(--gojek-green);
+            background: var(--gojek-green);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 170, 19, 0.3);
+            transform: scale(1.02);
+        }
+
+        .level-btn.unlocked {
+            border-color: var(--gojek-green);
+            color: var(--gojek-green);
+        }
+
+        .level-btn.unlocked:hover {
+            background: var(--gojek-green-bg);
+        }
+
+        .level-btn.locked {
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .level-btn.locked:hover {
+            border-color: var(--gojek-green);
+            opacity: 0.8;
+        }
+
+        .level-btn.locked::after {
+            content: ' 🔒';
+            font-size: 12px;
+        }
+
+        /* Game Play Area */
+        .game-play-area {
+            background: var(--bg-card);
+            padding: 30px 25px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            min-height: 380px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-play-area:hover {
+            box-shadow: var(--shadow-md);
+            border-color: rgba(0, 170, 19, 0.1);
+        }
+
+        /* Word Display */
+        .word-display {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--gojek-green);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            text-shadow: 0 2px 20px rgba(0, 170, 19, 0.1);
+            transition: var(--transition);
+        }
+
+        .word-display .letter {
+            display: inline-block;
+            min-width: 30px;
+            padding: 4px 2px;
+            border-bottom: 3px solid var(--gojek-green);
+            margin: 0 2px;
+            font-size: 28px;
+            transition: var(--transition);
+        }
+
+        .word-display .letter.guessed {
+            border-bottom-color: var(--gojek-green-light);
+            color: var(--gojek-green);
+        }
+
+        .word-display .letter.hint {
+            color: var(--info-color);
+            border-bottom-color: var(--info-color);
+        }
+
+        .hint-text {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .hint-text .hint-category {
+            color: var(--gojek-green);
+            font-weight: 700;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .input-group input {
+            padding: 14px 24px;
+            border-radius: 50px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 20px;
+            width: 80px;
+            text-align: center;
+            transition: var(--transition);
+            font-weight: 600;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .input-group input:focus {
+            border-color: var(--gojek-green);
+            box-shadow: 0 0 0 4px rgba(0, 170, 19, 0.1);
+        }
+
+        .input-group input:disabled {
+            opacity: 0.5;
+        }
+
+        .input-group button {
+            padding: 14px 36px;
+            border: none;
+            border-radius: 50px;
+            background: var(--gojek-green-gradient);
+            color: #ffffff;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 16px;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 170, 19, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .input-group button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
+        }
+
+        .input-group button:hover:not(:disabled)::after {
+            transform: translateX(100%);
+        }
+
+        .input-group button:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 170, 19, 0.35);
+        }
+
+        .input-group button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .input-group button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Used Letters */
+        .used-letters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .used-letters .letter-tag {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .used-letters .letter-tag.correct {
+            border-color: var(--gojek-green);
+            color: var(--gojek-green);
+            background: var(--gojek-green-bg);
+        }
+
+        .used-letters .letter-tag.wrong {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+            background: rgba(252, 129, 129, 0.1);
+        }
+
+        .message-area {
+            min-height: 60px;
+            margin: 10px 0;
+        }
+
+        .message {
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            animation: fadeIn 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .message.success {
+            background: var(--gojek-green-bg);
+            color: var(--gojek-green);
+            border: 1px solid var(--gojek-green);
+        }
+
+        .message.error {
+            background: rgba(252, 129, 129, 0.1);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        .message.info {
+            background: rgba(99, 179, 237, 0.1);
+            color: var(--info-color);
+            border: 1px solid var(--info-color);
+        }
+
+        .score-display {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+        }
+
+        .score-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--gojek-green);
+            margin-top: 2px;
+        }
+
+        /* Connect Wallet UI */
+        .connect-wallet-ui {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .connect-wallet-ui .icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .connect-wallet-ui h3 {
+            color: var(--gojek-green);
+            font-size: 24px;
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+
+        .connect-wallet-ui p {
+            color: var(--text-secondary);
+            margin: 16px auto;
+            max-width: 400px;
+            line-height: 1.8;
+        }
+
+        .connect-wallet-ui .btn-connect {
+            font-size: 18px;
+            padding: 14px 44px;
+            margin-top: 10px;
+        }
+
+        .connect-status {
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Modal Unlock */
+        .unlock-modal .modal {
+            max-width: 420px;
+        }
+
+        .unlock-info {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .unlock-info .price {
+            font-size: 42px;
+            color: var(--gojek-green);
+            font-weight: 900;
+            margin: 8px 0;
+        }
+
+        .unlock-info .price-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .wallet-status {
+            padding: 14px 20px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            margin: 16px 0;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wallet-status .label {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .wallet-status .value {
+            color: var(--gojek-green);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .unlock-btn {
+            padding: 16px 30px;
+            background: var(--gojek-green-gradient);
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin: 10px 0;
+            box-shadow: 0 4px 15px rgba(0, 170, 19, 0.25);
+        }
+
+        .unlock-btn:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 170, 19, 0.35);
+        }
+
+        .unlock-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .unlock-btn .btn-icon {
+            margin-right: 8px;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            max-width: 380px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 16px 20px;
+            border-radius: var(--border-radius);
+            animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--bg-card);
+            border-left: 4px solid var(--gojek-green);
+        }
+
+        .toast.success { border-left-color: var(--gojek-green); }
+        .toast.error { border-left-color: var(--danger-color); }
+        .toast.info { border-left-color: var(--info-color); }
+
+        .toast .toast-icon { font-size: 22px; }
+        .toast .toast-message {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .game-container { padding: 10px; }
+            .game-header { padding: 12px 16px; flex-wrap: wrap; justify-content: center; }
+            .game-title { font-size: 18px; }
+            .game-status-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px 16px; }
+            .status-item .value { font-size: 16px; }
+            .word-display { font-size: 24px; }
+            .word-display .letter { font-size: 20px; min-width: 24px; }
+            .game-play-area { padding: 20px 15px; min-height: 320px; }
+            .input-group input { width: 70px; font-size: 18px; padding: 12px 16px; }
+            .input-group button { padding: 12px 24px; font-size: 15px; }
+            .level-btn { padding: 8px 16px; font-size: 12px; min-width: 65px; }
+            .score-display { flex-wrap: wrap; gap: 10px; padding: 12px 16px; }
+            .score-value { font-size: 18px; }
+            .modal { padding: 24px 20px; width: 95%; }
+            .unlock-info .price { font-size: 34px; }
+            .wallet-status { flex-direction: column; gap: 4px; }
+        }
+
+        @media (max-width: 380px) {
+            .word-display { font-size: 20px; }
+            .word-display .letter { font-size: 16px; min-width: 20px; }
+            .input-group input { width: 60px; font-size: 16px; padding: 10px 12px; }
+            .level-btn { padding: 6px 12px; font-size: 11px; min-width: 55px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <div class="game-header">
+            <a href="../../index.html" class="back-btn">← Kembali</a>
+            <span class="game-title">
+                <span class="title-icon">📝</span> Tebak Kata
+            </span>
+            <button class="reset-btn" onclick="window.resetGame && resetGame()">
+                🔄 Reset
+            </button>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="game-status-bar" id="statusBar">
+            <div class="status-item">
+                <div class="label">Level</div>
+                <div class="value" id="currentLevel">1</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Percobaan</div>
+                <div class="value" id="attempts">0</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Kesalahan</div>
+                <div class="value" id="mistakes">0/6</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Wallet</div>
+                <div class="value" id="walletStatus">✅ Connected</div>
+            </div>
+        </div>
+
+        <!-- Level Selector -->
+        <div class="level-selector" id="levelSelector"></div>
+
+        <!-- Game Area -->
+        <div class="game-play-area" id="gameArea">
+            <div id="gameContent">
+                <div class="hint-text" id="hintText">
+                    Kategori: <span class="hint-category" id="categoryDisplay">-</span>
+                </div>
+                <div class="word-display" id="wordDisplay"></div>
+                <div class="hint-text" id="subHint" style="font-size:13px; color: var(--text-muted);">
+                    Ketik huruf untuk menebak
+                </div>
+                
+                <div class="input-group">
+                    <input type="text" id="guessInput" maxlength="1" placeholder="A">
+                    <button id="guessBtn">Tebak!</button>
+                </div>
+                
+                <div class="used-letters" id="usedLetters"></div>
+                
+                <div class="message-area" id="messageArea"></div>
+                
+                <div class="score-display">
+                    <div class="score-item">
+                        <div class="score-label">Level</div>
+                        <div class="score-value" id="scoreLevel">1</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Benar</div>
+                        <div class="score-value" id="scoreCorrect">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Salah</div>
+                        <div class="score-value" id="scoreWrong">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Unlock -->
+    <div class="modal-overlay unlock-modal" id="unlockModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">🔓 Buka Level</span>
+                <button class="modal-close" onclick="closeUnlockModal()">✕</button>
+            </div>
+            <div class="unlock-info">
+                <div class="price-label">Buka level ini seharga</div>
+                <div class="price" id="unlockPrice">10 OJOL</div>
+                <div class="wallet-status">
+                    <span class="label">Saldo Anda</span>
+                    <span class="value" id="unlockBalance">0 OJOL</span>
+                </div>
+                <button class="unlock-btn" id="unlockConfirmBtn">
+                    <span class="btn-icon">💳</span> Bayar 10 OJOL
+                </button>
+                <p style="color: var(--text-muted); font-size: 11px; margin-top: 12px; word-break: break-all;">
+                    Token akan ditransfer ke:<br>
+                    <span style="font-family: monospace; font-size: 12px;">0x0F451D746EFD63397d413eD6d4A994356ba61421</span>
+                </p>
+                <div id="unlockMessage" style="margin-top: 16px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============================================ -->
+    <!-- SCRIPTS -->
+    <!-- ============================================ -->
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script src="../../js/web3-config.js"></script>
+    <script src="../../js/wallet-manager.js"></script>
+    <script src="../../js/game-manager.js"></script>
+
+    <!-- ============================================ -->
+    <!-- GAME SCRIPT - TEBAK KATA -->
+    <!-- ============================================ -->
+
+    <script>
+    (function() {
+        'use strict';
+
+        // === STATE ===
+        const state = {
+            gameId: 'tebak-kata',
+            currentLevel: 1,
+            word: '',
+            category: '',
+            wordDisplay: [],
+            guessedLetters: [],
+            wrongLetters: [],
+            maxMistakes: 6,
+            mistakes: 0,
+            attempts: 0,
+            isPlaying: false,
+            gameOver: false,
+            isProcessing: false,
+            gameConfig: null,
+            unlockedLevels: [1],
+            bestScores: {},
+            isInitialized: false
+        };
+
+        // === WORD LIST ===
+        const WORDS = {
+            1: {
+                category: 'Binatang',
+                words: ['KUCING', 'ANJING', 'KELINCI', 'BURUNG', 'IKAN', 'ULAR', 'KAMBING', 'SAPI', 'KUDA', 'MONYET']
+            },
+            2: {
+                category: 'Buah',
+                words: ['APEL', 'PISANG', 'ANGGUR', 'JERUK', 'MANGGIS', 'NANAS', 'PEPAYA', 'DURIAN', 'RAMBUTAN', 'MANGGA']
+            },
+            3: {
+                category: 'Negara',
+                words: ['INDONESIA', 'JEPANG', 'KOREA', 'CINA', 'AMERIKA', 'INGGRIS', 'PRANCIS', 'ITALIA', 'MESIR', 'BRAZIL']
+            },
+            4: {
+                category: 'Profesi',
+                words: ['DOKTER', 'GURU', 'POLISI', 'PILOT', 'KOKI', 'ARSITEK', 'INSINYUR', 'AKUNTAN', 'PENULIS', 'PELUKIS']
+            },
+            5: {
+                category: 'Kata Sulit',
+                words: ['KOMPUTER', 'TELEVISI', 'KENDARAAN', 'PERPUSTAKAAN', 'KESEHATAN', 'PENDIDIKAN', 'TEKNOLOGI', 'PEMBANGUNAN']
+            }
+        };
+
+        // === DOM REFS ===
+        const dom = {};
+
+        function getDOMElements() {
+            dom.gameArea = document.getElementById('gameArea');
+            dom.gameContent = document.getElementById('gameContent');
+            dom.levelSelector = document.getElementById('levelSelector');
+            dom.currentLevel = document.getElementById('currentLevel');
+            dom.attempts = document.getElementById('attempts');
+            dom.mistakes = document.getElementById('mistakes');
+            dom.walletStatus = document.getElementById('walletStatus');
+            dom.wordDisplay = document.getElementById('wordDisplay');
+            dom.categoryDisplay = document.getElementById('categoryDisplay');
+            dom.subHint = document.getElementById('subHint');
+            dom.guessInput = document.getElementById('guessInput');
+            dom.guessBtn = document.getElementById('guessBtn');
+            dom.usedLetters = document.getElementById('usedLetters');
+            dom.messageArea = document.getElementById('messageArea');
+            dom.scoreLevel = document.getElementById('scoreLevel');
+            dom.scoreCorrect = document.getElementById('scoreCorrect');
+            dom.scoreWrong = document.getElementById('scoreWrong');
+            dom.unlockModal = document.getElementById('unlockModal');
+            dom.unlockPrice = document.getElementById('unlockPrice');
+            dom.unlockBalance = document.getElementById('unlockBalance');
+            dom.unlockMessage = document.getElementById('unlockMessage');
+            dom.unlockConfirmBtn = document.getElementById('unlockConfirmBtn');
+            dom.toastContainer = document.getElementById('toastContainer');
+        }
+
+        // === TOAST ===
+        function showToast(message, type = 'info') {
+            if (!dom.toastContainer) return;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            dom.toastContainer.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s';
+                    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
+                }
+            }, 4000);
+        }
+
+        // === LOAD BEST SCORES ===
+        function loadBestScores() {
+            try {
+                const saved = localStorage.getItem('bestScores_tebak-kata');
+                return saved ? JSON.parse(saved) : {};
+            } catch { return {}; }
+        }
+
+        function saveBestScore(level, attempts) {
+            if (!state.bestScores[level] || attempts < state.bestScores[level]) {
+                state.bestScores[level] = attempts;
+                try {
+                    localStorage.setItem('bestScores_tebak-kata', JSON.stringify(state.bestScores));
+                } catch (e) {}
+            }
+        }
+
+        // === LOAD GAME CONFIG ===
+        function loadGameConfig() {
+            if (typeof gameManager !== 'undefined' && gameManager) {
+                const config = gameManager.getGame(state.gameId);
+                if (config) {
+                    state.gameConfig = config;
+                    state.unlockedLevels = [1];
+                    for (let i = 2; i <= config.levels; i++) {
+                        if (gameManager.isLevelUnlocked(state.gameId, i)) {
+                            state.unlockedLevels.push(i);
+                        }
+                    }
+                    return;
+                }
+            }
+            state.gameConfig = { id: 'tebak-kata', title: 'Tebak Kata', levels: 5, price: 10 };
+            state.unlockedLevels = [1];
+        }
+
+        // === RENDER LEVEL BUTTONS ===
+        function renderLevelButtons() {
+            if (!dom.levelSelector) return;
+            dom.levelSelector.innerHTML = '';
+            const levels = state.gameConfig ? state.gameConfig.levels : 5;
+            
+            for (let i = 1; i <= levels; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'level-btn';
+                btn.dataset.level = i;
+                const isUnlocked = state.unlockedLevels.includes(i);
+                const isActive = i === state.currentLevel;
+                if (isUnlocked) {
+                    btn.classList.add('unlocked');
+                    btn.textContent = `Level ${i}`;
+                } else {
+                    btn.classList.add('locked');
+                    btn.textContent = `Level ${i} 🔒`;
+                }
+                if (isActive) btn.classList.add('active');
+                btn.addEventListener('click', function() {
+                    const level = parseInt(this.dataset.level);
+                    selectLevel(level);
+                });
+                dom.levelSelector.appendChild(btn);
+            }
+        }
+
+        // === SELECT LEVEL ===
+        function selectLevel(level) {
+            const isUnlocked = state.unlockedLevels.includes(level);
+            if (!isUnlocked) {
+                state.pendingUnlockLevel = level;
+                showUnlockModal(level);
+                return;
+            }
+            if (state.isPlaying && !state.gameOver) {
+                if (!confirm('Game sedang berlangsung. Yakin ingin pindah level?')) return;
+            }
+            state.currentLevel = level;
+            startLevel(level);
+            renderLevelButtons();
+        }
+
+        // === START LEVEL ===
+        function startLevel(level) {
+            const wordList = WORDS[level] || WORDS[1];
+            const words = wordList.words;
+            state.category = wordList.category;
+            state.word = words[Math.floor(Math.random() * words.length)];
+            state.wordDisplay = state.word.split('');
+            state.guessedLetters = [];
+            state.wrongLetters = [];
+            state.mistakes = 0;
+            state.attempts = 0;
+            state.gameOver = false;
+            state.isPlaying = true;
+            state.isProcessing = false;
+
+            dom.currentLevel.textContent = level;
+            dom.attempts.textContent = '0';
+            dom.mistakes.textContent = `0/${state.maxMistakes}`;
+            dom.categoryDisplay.textContent = state.category;
+            dom.guessInput.disabled = false;
+            dom.guessInput.value = '';
+            dom.guessBtn.disabled = false;
+            dom.messageArea.innerHTML = '';
+            dom.scoreLevel.textContent = level;
+            dom.scoreCorrect.textContent = '0';
+            dom.scoreWrong.textContent = '0';
+
+            renderWordDisplay();
+            renderUsedLetters();
+            dom.guessInput.focus();
+            
+            console.log(`📝 Level ${level} dimulai! Kata: ${state.word}`);
+        }
+
+        // === RENDER WORD DISPLAY ===
+        function renderWordDisplay() {
+            dom.wordDisplay.innerHTML = '';
+            state.wordDisplay.forEach((letter, index) => {
+                const span = document.createElement('span');
+                span.className = 'letter';
+                span.dataset.index = index;
+                if (state.guessedLetters.includes(letter)) {
+                    span.textContent = letter;
+                    span.classList.add('guessed');
+                } else {
+                    span.textContent = '_';
+                }
+                dom.wordDisplay.appendChild(span);
+            });
+        }
+
+        // === RENDER USED LETTERS ===
+        function renderUsedLetters() {
+            dom.usedLetters.innerHTML = '';
+            const allLetters = [...new Set([...state.guessedLetters, ...state.wrongLetters])];
+            if (allLetters.length === 0) {
+                dom.usedLetters.innerHTML = '<span style="color: var(--text-muted); font-size: 13px;">Belum ada huruf yang ditebak</span>';
+                return;
+            }
+            allLetters.sort().forEach(letter => {
+                const tag = document.createElement('span');
+                tag.className = 'letter-tag';
+                if (state.guessedLetters.includes(letter)) {
+                    tag.classList.add('correct');
+                    tag.textContent = `✅ ${letter}`;
+                } else {
+                    tag.classList.add('wrong');
+                    tag.textContent = `❌ ${letter}`;
+                }
+                dom.usedLetters.appendChild(tag);
+            });
+        }
+
+        // === HANDLE GUESS ===
+        function handleGuess() {
+            if (!state.isPlaying || state.gameOver || state.isProcessing) return;
+            if (!dom.guessInput) return;
+
+            const input = dom.guessInput;
+            const guess = input.value.toUpperCase().trim();
+            
+            if (!guess || guess.length !== 1 || !guess.match(/[A-Z]/)) {
+                showMessage('Masukkan satu huruf (A-Z)!', 'error');
+                input.value = '';
+                input.focus();
+                return;
+            }
+
+            // Cek apakah huruf sudah ditebak
+            if (state.guessedLetters.includes(guess) || state.wrongLetters.includes(guess)) {
+                showMessage(`Huruf "${guess}" sudah ditebak!`, 'info');
+                input.value = '';
+                input.focus();
+                return;
+            }
+
+            state.isProcessing = true;
+            state.attempts++;
+
+            if (state.word.includes(guess)) {
+                // Huruf benar
+                state.guessedLetters.push(guess);
+                dom.scoreCorrect.textContent = state.guessedLetters.length;
+                showMessage(`✅ Huruf "${guess}" benar!`, 'success');
+                renderWordDisplay();
+                renderUsedLetters();
+
+                // Cek apakah semua huruf sudah ditebak
+                const allGuessed = state.wordDisplay.every(letter => state.guessedLetters.includes(letter));
+                if (allGuessed) {
+                    endGame(true);
+                }
+            } else {
+                // Huruf salah
+                state.wrongLetters.push(guess);
+                state.mistakes++;
+                dom.scoreWrong.textContent = state.wrongLetters.length;
+                dom.mistakes.textContent = `${state.mistakes}/${state.maxMistakes}`;
+                showMessage(`❌ Huruf "${guess}" salah!`, 'error');
+                renderUsedLetters();
+
+                if (state.mistakes >= state.maxMistakes) {
+                    endGame(false, `😅 Kesalahan maksimal! Kata yang benar adalah "${state.word}"`);
+                }
+            }
+
+            input.value = '';
+            input.focus();
+            dom.attempts.textContent = state.attempts;
+            state.isProcessing = false;
+        }
+
+        // === END GAME ===
+        function endGame(win, customMessage) {
+            if (state.gameOver) return;
+            state.gameOver = true;
+            state.isPlaying = false;
+            dom.guessInput.disabled = true;
+            dom.guessBtn.disabled = true;
+
+            if (win) {
+                saveBestScore(state.currentLevel, state.attempts);
+                showMessage(`🎉 Selamat! Anda menebak kata "${state.word}" dengan ${state.attempts} percobaan!`, 'success');
+                dom.wordDisplay.querySelectorAll('.letter').forEach(el => el.classList.add('guessed'));
+                
+                if (typeof gameManager !== 'undefined' && gameManager) {
+                    gameManager.incrementGamesPlayed();
+                }
+
+                const nextLevel = state.currentLevel + 1;
+                if (nextLevel <= state.gameConfig.levels) {
+                    if (!state.unlockedLevels.includes(nextLevel)) {
+                        state.unlockedLevels.push(nextLevel);
+                        if (typeof gameManager !== 'undefined' && gameManager) {
+                            const key = `${state.gameId}-level-${nextLevel}`;
+                            gameManager.unlockedLevels[key] = true;
+                            gameManager.saveToStorage();
+                        }
+                        renderLevelButtons();
+                        showToast(`🎯 Level ${nextLevel} terbuka!`, 'success');
+                        setTimeout(() => {
+                            if (confirm(`🎯 Level ${nextLevel} sekarang terbuka! Lanjutkan?`)) {
+                                selectLevel(nextLevel);
+                            }
+                        }, 1000);
+                    } else {
+                        setTimeout(() => {
+                            if (confirm(`🎯 Lanjut ke Level ${nextLevel}?`)) {
+                                selectLevel(nextLevel);
+                            }
+                        }, 1000);
+                    }
+                } else {
+                    setTimeout(() => {
+                        showToast('🏆 Anda telah menyelesaikan semua level!', 'success');
+                    }, 500);
+                }
+            } else {
+                const message = customMessage || '😅 Coba lagi!';
+                showMessage(message, 'error');
+                // Tampilkan kata yang benar
+                dom.wordDisplay.querySelectorAll('.letter').forEach((el, i) => {
+                    el.textContent = state.word[i];
+                    el.classList.add('guessed');
+                });
+                setTimeout(() => {
+                    if (confirm('🔄 Coba lagi?')) {
+                        startLevel(state.currentLevel);
+                    }
+                }, 800);
+            }
+        }
+
+        // === SHOW MESSAGE ===
+        function showMessage(text, type) {
+            if (!dom.messageArea) return;
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            dom.messageArea.innerHTML = `
+                <div class="message ${type}">
+                    <span>${icons[type] || 'ℹ️'}</span>
+                    <span>${text}</span>
+                </div>
+            `;
+        }
+
+        // === UNLOCK MODAL ===
+        function showUnlockModal(level) {
+            if (!dom.unlockModal) return;
+            const price = state.gameConfig ? state.gameConfig.price : 10;
+            const balance = (typeof walletManager !== 'undefined' && walletManager.isConnected) ? 
+                (walletManager.balance || 0) : 0;
+            dom.unlockPrice.textContent = `${price} OJOL`;
+            dom.unlockBalance.textContent = `${balance.toFixed(2)} OJOL`;
+            dom.unlockMessage.innerHTML = '';
+            dom.unlockConfirmBtn.onclick = function() { processUnlock(level); };
+            dom.unlockConfirmBtn.disabled = false;
+            dom.unlockConfirmBtn.innerHTML = `<span class="btn-icon">💳</span> Bayar ${price} OJOL`;
+            dom.unlockModal.classList.add('active');
+            state.pendingUnlockLevel = level;
+        }
+
+        function closeUnlockModal() {
+            if (dom.unlockModal) dom.unlockModal.classList.remove('active');
+            if (dom.unlockMessage) dom.unlockMessage.innerHTML = '';
+            state.pendingUnlockLevel = null;
+        }
+
+        async function processUnlock(level) {
+            if (!dom.unlockConfirmBtn || !dom.unlockMessage) return;
+            if (typeof walletManager === 'undefined' || !walletManager.isConnected) {
+                dom.unlockMessage.innerHTML = `<div class="message error">❌ Wallet belum terhubung!</div>`;
+                return;
+            }
+            const price = state.gameConfig ? state.gameConfig.price : 10;
+            const balance = walletManager.balance || 0;
+            if (balance < price) {
+                dom.unlockMessage.innerHTML = `
+                    <div class="message error">❌ Saldo tidak cukup! Saldo: ${balance.toFixed(2)} OJOL, Harga: ${price} OJOL</div>
+                `;
+                return;
+            }
+            dom.unlockConfirmBtn.disabled = true;
+            dom.unlockConfirmBtn.innerHTML = `<span class="btn-icon">⏳</span> Memproses...`;
+            dom.unlockMessage.innerHTML = `<div class="message info">⏳ Memproses pembayaran...</div>`;
+            try {
+                const result = await gameManager.unlockLevel(state.gameId, level);
+                if (result.success) {
+                    dom.unlockMessage.innerHTML = `<div class="message success">✅ ${result.message}</div>`;
+                    if (!state.unlockedLevels.includes(level)) {
+                        state.unlockedLevels.push(level);
+                    }
+                    renderLevelButtons();
+                    setTimeout(() => {
+                        closeUnlockModal();
+                        selectLevel(level);
+                        showToast(`✅ Level ${level} berhasil dibuka!`, 'success');
+                    }, 1500);
+                } else {
+                    dom.unlockMessage.innerHTML = `<div class="message error">❌ ${result.error}</div>`;
+                    dom.unlockConfirmBtn.disabled = false;
+                    dom.unlockConfirmBtn.innerHTML = `<span class="btn-icon">💳</span> Bayar ${price} OJOL`;
+                }
+            } catch (error) {
+                console.error('Unlock error:', error);
+                dom.unlockMessage.innerHTML = `<div class="message error">❌ Error: ${error.message}</div>`;
+                dom.unlockConfirmBtn.disabled = false;
+                dom.unlockConfirmBtn.innerHTML = `<span class="btn-icon">💳</span> Bayar ${price} OJOL`;
+            }
+        }
+
+        // === RESET GAME ===
+        window.resetGame = function() {
+            if (!confirm('⚠️ Yakin ingin mereset semua progress?\n\nLevel 2-5 akan terkunci kembali.')) return;
+            state.unlockedLevels = [1];
+            state.bestScores = {};
+            localStorage.removeItem('bestScores_tebak-kata');
+            if (typeof gameManager !== 'undefined' && gameManager) {
+                for (let i = 2; i <= state.gameConfig.levels; i++) {
+                    const key = `${state.gameId}-level-${i}`;
+                    delete gameManager.unlockedLevels[key];
+                }
+                gameManager.saveToStorage();
+            }
+            renderLevelButtons();
+            startLevel(1);
+            showToast('✅ Game direset! Hanya Level 1 yang terbuka.', 'success');
+        };
+
+        // === CHECK WALLET ===
+        async function checkWallet() {
+            if (typeof walletManager === 'undefined') return false;
+            if (walletManager.isConnected) {
+                dom.walletStatus.textContent = '✅ ' + (walletManager.account ? 
+                    walletManager.account.slice(0, 6) + '...' + walletManager.account.slice(-4) : 'Connected');
+                dom.walletStatus.className = 'value';
+                return true;
+            }
+            try {
+                const result = await walletManager.connect();
+                if (result && result.success) {
+                    dom.walletStatus.textContent = '✅ ' + (walletManager.account ? 
+                        walletManager.account.slice(0, 6) + '...' + walletManager.account.slice(-4) : 'Connected');
+                    dom.walletStatus.className = 'value';
+                    return true;
+                }
+            } catch (e) {}
+            dom.walletStatus.textContent = '❌ Not Connected';
+            dom.walletStatus.className = 'value danger';
+            return false;
+        }
+
+        // === SHOW CONNECT UI ===
+        function showConnectUI() {
+            if (!dom.gameArea) return;
+            dom.gameArea.innerHTML = `
+                <div class="connect-wallet-ui">
+                    <div class="icon">🔗</div>
+                    <h3>Hubungkan Wallet</h3>
+                    <p>Untuk memainkan game ini, Anda perlu menghubungkan wallet terlebih dahulu.<br>
+                    <span style="font-size: 14px; color: var(--text-muted);">
+                        🦊 Pastikan menggunakan <strong>MetaMask</strong> di jaringan <strong>BSC Mainnet</strong>
+                    </span></p>
+                    <button class="btn-connect" onclick="window.handleConnectWallet()">🔌 Hubungkan Wallet</button>
+                    <div class="connect-status" id="connectStatus">⏳ Klik tombol di atas untuk menghubungkan</div>
+                </div>
+            `;
+        }
+
+        window.handleConnectWallet = async function() {
+            const statusEl = document.getElementById('connectStatus');
+            try {
+                if (statusEl) {
+                    statusEl.textContent = '⏳ Menghubungkan...';
+                    statusEl.style.color = 'var(--gojek-green)';
+                }
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('MetaMask tidak terdeteksi!');
+                }
+                if (typeof walletManager === 'undefined') {
+                    throw new Error('Wallet Manager tidak ditemukan!');
+                }
+                const result = await walletManager.connect();
+                if (result && result.success) {
+                    if (statusEl) {
+                        statusEl.textContent = '✅ Wallet terhubung! Memuat game...';
+                        statusEl.style.color = 'var(--gojek-green)';
+                    }
+                    showToast('Wallet berhasil terhubung!', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    throw new Error(result?.error || 'Gagal menghubungkan wallet');
+                }
+            } catch (error) {
+                if (statusEl) {
+                    statusEl.textContent = `❌ ${error.message}`;
+                    statusEl.style.color = 'var(--danger-color)';
+                }
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+
+        // === INIT GAME ===
+        async function initGame() {
+            console.log('📝 Inisialisasi Game Tebak Kata...');
+            getDOMElements();
+            const isConnected = await checkWallet();
+            if (!isConnected) {
+                showConnectUI();
+                return;
+            }
+            state.bestScores = loadBestScores();
+            loadGameConfig();
+            renderLevelButtons();
+            startLevel(1);
+            state.isInitialized = true;
+            console.log('✅ Game Tebak Kata siap dimainkan!');
+        }
+
+        // === EVENT LISTENERS ===
+        function setupEventListeners() {
+            const guessBtn = document.getElementById('guessBtn');
+            if (guessBtn) {
+                guessBtn.addEventListener('click', handleGuess);
+            }
+            const guessInput = document.getElementById('guessInput');
+            if (guessInput) {
+                guessInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleGuess();
+                    }
+                });
+                guessInput.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase().slice(0, 1);
+                });
+            }
+            const modal = document.getElementById('unlockModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) closeUnlockModal();
+                });
+            }
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeUnlockModal();
+            });
+            console.log('✅ Event listeners setup');
+        }
+
+        // === EXPOSE GLOBAL ===
+        window.closeUnlockModal = closeUnlockModal;
+        window.debugGame = {
+            state: state,
+            startLevel: startLevel,
+            selectLevel: selectLevel,
+            reset: window.resetGame,
+            forceUnlock: function(level) {
+                if (!state.unlockedLevels.includes(level)) {
+                    state.unlockedLevels.push(level);
+                }
+                renderLevelButtons();
+                showToast(`Level ${level} di-unlock (debug)`, 'info');
+            }
+        };
+
+        // === START ===
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM ready');
+            setTimeout(function() {
+                initGame();
+                setupEventListeners();
+            }, 300);
+        });
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(function() {
+                initGame();
+                setupEventListeners();
+            }, 300);
+        }
+
+        console.log('🛠️ Debug: Ketik debugGame di console');
+        console.log('   - debugGame.forceUnlock(2) - Unlock level 2');
+        console.log('   - debugGame.reset() - Reset ke level 1');
+        console.log('   - debugGame.state - Lihat state game');
+
+    })();
+    </script>
+
+</body>
+</html>
