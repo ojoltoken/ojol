@@ -1,0 +1,16 @@
+{
+  "games": [
+   
+    {
+      "id": "tebak-warna",
+      "title": "Tebak Warna",
+      "description": "Pilih warna yang sesuai dengan nama!",
+      "thumbnail": "https://alyne.id/hybrid/game/assets/images/tebak-warna.jpg",
+      "price": 10,
+      "levels": 5,
+      "level1Free": true,
+      "contractAddress": "0x0cCB00abb35109FF33F0AbaB1C07915900954695",
+      "paymentAddress": "0x0F451D746EFD63397d413eD6d4A994356ba61421"
+    }
+  ]
+}
