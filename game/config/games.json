@@ -27,7 +27,7 @@
       "title": "Tebak Warna",
       "description": "Pilih warna yang sesuai dengan nama!",
       "thumbnail": "https://alyne.id/hybrid/game/assets/images/tebak-warna.jpg",
-      "price": 10,
+      "price": 20,
       "levels": 5,
       "level1Free": true,
       "contractAddress": "0x0cCB00abb35109FF33F0AbaB1C07915900954695",
