@@ -261,7 +261,7 @@ body {
     background: var(--gojek-green-gradient);
     border-radius: var(--border-radius);
     margin: 24px 0 32px;
-    color: var(--text-light);
+    color: var(--gojek-green);
     position: relative;
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0, 170, 19, 0.3);
