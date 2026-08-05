@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ojol Game Portal</title>
+    <link rel="stylesheet" href="assets/css/global.css">
+    <style>
+        .hero {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            margin: 20px 0;
+        }
+        
+        .hero h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">🎮 Ojol Game Portal</div>
+            <div class="wallet-section">
+                <div class="wallet-info" id="wallet-info">
+                    <span>💰 <span class="balance" id="balance-display">0.00</span> OJOL</span>
+                    <span class="address" id="address-display">Belum terhubung</span>
+                </div>
+                <button class="btn-connect" id="connect-btn">Connect Wallet</button>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <div class="hero">
+            <h1>Selamat Datang di Portal Game Ojol</h1>
+            <p>Mainkan game-game seru, buka level dengan token OJOL!</p>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-label">Total Game</div>
+                <div class="stat-value" id="total-games">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Game Dimainkan</div>
+                <div class="stat-value" id="games-played">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Level Terbuka</div>
+                <div class="stat-value" id="total-unlocked">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Saldo OJOL</div>
+                <div class="stat-value" id="stat-balance">0.00</div>
+            </div>
+        </div>
+
+        <!-- Game Grid -->
+        <h2 style="margin: 20px 0 10px 0; color: var(--text-secondary);">🎯 Daftar Game</h2>
+        <div id="game-grid" class="game-grid">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Memuat daftar game...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script src="js/web3-config.js"></script>
+    <script src="js/wallet-manager.js"></script>
+    <script src="js/game-manager.js"></script>
+    <script>
+        // Portal utama script
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Cek apakah wallet sudah terhubung
+            try {
+                const result = await walletManager.connect();
+                if (result.success) {
+                    updateUI();
+                }
+            } catch (error) {
+                console.log('Wallet not connected yet');
+            }
+            
+            // Setup connect button
+            document.getElementById('connect-btn').addEventListener('click', async () => {
+                const btn = document.getElementById('connect-btn');
+                btn.disabled = true;
+                btn.textContent = 'Menghubungkan...';
+                
+                const result = await walletManager.connect();
+                if (result.success) {
+                    updateUI();
+                    showToast('Wallet berhasil terhubung!', 'success');
+                } else {
+                    showToast('Gagal menghubungkan wallet: ' + result.error, 'error');
+                }
+                
+                btn.disabled = false;
+                btn.textContent = 'Connect Wallet';
+            });
+            
+            // Event listener untuk wallet manager
+            walletManager.on('connected', (data) => {
+                updateUI();
+                showToast(`Wallet terhubung: ${data.account.slice(0, 6)}...${data.account.slice(-4)}`, 'success');
+            });
+            
+            walletManager.on('balanceUpdated', (data) => {
+                updateUI();
+            });
+            
+            walletManager.on('disconnected', () => {
+                updateUI();
+                showToast('Wallet terputus', 'error');
+            });
+            
+            // Load games
+            await gameManager.loadGamesConfig();
+            updateUI();
+        });
+        
+        function updateUI() {
+            // Update wallet info
+            const balanceEl = document.getElementById('balance-display');
+            const addressEl = document.getElementById('address-display');
+            const statBalance = document.getElementById('stat-balance');
+            
+            if (walletManager.isConnected) {
+                balanceEl.textContent = walletManager.balance.toFixed(2);
+                addressEl.textContent = `${walletManager.account.slice(0, 6)}...${walletManager.account.slice(-4)}`;
+                statBalance.textContent = walletManager.balance.toFixed(2);
+                document.getElementById('connect-btn').textContent = 'Connected';
+                document.getElementById('connect-btn').style.opacity = '0.7';
+            } else {
+                balanceEl.textContent = '0.00';
+                addressEl.textContent = 'Belum terhubung';
+                statBalance.textContent = '0.00';
+                document.getElementById('connect-btn').textContent = 'Connect Wallet';
+                document.getElementById('connect-btn').style.opacity = '1';
+            }
+            
+            // Update stats
+            document.getElementById('total-games').textContent = gameManager.games.length;
+            document.getElementById('games-played').textContent = gameManager.getGamesPlayed();
+            
+            // Total level terbuka
+            let totalUnlocked = 0;
+            gameManager.games.forEach(game => {
+                totalUnlocked += gameManager.getUnlockCount(game.id);
+            });
+            document.getElementById('total-unlocked').textContent = totalUnlocked;
+            
+            // Render game cards
+            gameManager.updateUI();
+        }
+        
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
